@@ -48,6 +48,7 @@ namespace Luna {
 		std::vector<Material> materials;
 		std::vector<BoundingBox> boundingBoxes;
 		std::vector<Skeleton> skeletons;
+		std::vector<Weights*> weights;
 		std::vector<Joint*> joints;
 
 		unsigned int meshCount;

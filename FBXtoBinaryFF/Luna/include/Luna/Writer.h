@@ -10,8 +10,6 @@ namespace Luna {
 		~Writer();
 
 		void setMeshName(unsigned int meshID, const char* name);
-		void setVertexCount(unsigned int meshID, unsigned int count);
-		void setIndexCount(unsigned int meshID, unsigned int count);
 		//void setMeshPosition(unsigned int meshID, float x, float y, float z);
 
 		void setVertexPosition(Vertex& vertex, float x, float y, float z);

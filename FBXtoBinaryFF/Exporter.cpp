@@ -14,6 +14,11 @@ Exporter::~Exporter() {
 		delete (this->meshIndices[i]);
 	}
 	this->meshVertices.clear();
+
+	for (int i = 0; i < this->joints.size(); i++) {
+		delete (this->joints[i]);
+	}
+	this->joints.clear();
 }
 
 Luna::Writer Exporter::getWriter() const {
@@ -71,6 +76,10 @@ void Exporter::WriteToBinary(const char* filename){
 		std::cout << "ID: " << this->writer.skeletons[i].skeletonID << std::endl;
 		std::cout << "Amount of joints: " << this->writer.skeletons[i].jointCount << std::endl;
 		std::cout << "Amount of animations: " << this->writer.skeletons[i].animationCount << std::endl;
+
+		for (int j = 0; j < this->writer.skeletons[i].jointCount; j++) {
+			writer.write(outfile, this->joints[i][j]);
+		}
 	}
 
 	outfile.close();

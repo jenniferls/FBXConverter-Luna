@@ -23,15 +23,15 @@ private:
 	std::string outputFile;
 	std::experimental::filesystem::path outputPath;
 
-	std::vector<Luna::Vertex*> meshVertices;
-	std::vector<Luna::Index*> meshIndices;
-	std::vector<Luna::Joint*> joints;
+	//std::vector<Luna::Vertex*> meshVertices;
+	//std::vector<Luna::Index*> meshIndices;
 
 	void GetData(FbxNode* node, Exporter* exporter);
 	void GetMeshData(FbxMesh* mesh, Exporter* exporter);
 	void GetMaterialData(FbxMesh* mesh, Exporter* exporter);
 	bool GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter);
 	void GetSkeletonData(FbxNode* node, Exporter* exporter);
+	void GetWeightsData(FbxMesh* mesh, Exporter* exporter);
 
 	bool isBoundingBox(FbxNode* node);
 	bool hasSkeleton(FbxNode* node);

@@ -22,6 +22,7 @@ namespace Luna {
 		Material getMaterial(int meshID) const;
 		void getMaterials(std::vector<Material>& materials);
 		BoundingBox getBoundingBox(int meshID) const;
+		Skeleton getSkeleton(int id) const;
 		void getWeights(int meshID, std::vector<Weights>& weights); //The number of weights is equal to the number of vertices
 		void getAnimation();
 
@@ -47,6 +48,7 @@ namespace Luna {
 		std::vector<Material> materials;
 		std::vector<BoundingBox> boundingBoxes;
 		std::vector<Skeleton> skeletons;
+		std::vector<Weights*> weights;
 		std::vector<Joint*> joints;
 
 		unsigned int meshCount;

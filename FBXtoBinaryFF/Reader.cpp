@@ -88,6 +88,7 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 
 	if (tempMesh.hasSkeleton) {
 		std::cout << "The mesh has a skeleton!" << std::endl; //Debug
+		GetWeightsData(mesh, exporter);
 		exporter->writer.scene.skeletonCount += 1;
 	}
 
@@ -316,6 +317,20 @@ bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
 
 void Reader::GetSkeletonData(FbxNode* node, Exporter* exporter) {
 	exporter->writer.skeletons.resize(exporter->writer.scene.skeletonCount);
+}
+
+void Reader::GetWeightsData(FbxMesh* mesh, Exporter* exporter) {
+	FbxSkin* skin = (FbxSkin*)mesh->GetDeformer(0, FbxDeformer::eSkin);
+	if (skin) {
+		unsigned int jointCount = skin->GetClusterCount();
+		for (int i = 0; i < jointCount; i++) {
+			FbxCluster* cluster = skin->GetCluster(i);
+			FbxNode* joint = cluster->GetLink();
+			for (int j = 0; j < cluster->GetControlPointIndicesCount(); j++) {
+				float weight = cluster->GetControlPointWeights()[j];
+			}
+		}
+	}
 }
 
 bool Reader::isBoundingBox(FbxNode* node) {
