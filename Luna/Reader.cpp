@@ -183,4 +183,11 @@ namespace Luna {
 			weights[i] = this->weights[meshID][i];
 		}
 	}
+
+	void Reader::getJoints(int skeletonID, std::vector<Joint>& joints) {
+		joints.resize(this->skeletons[skeletonID].jointCount);
+		for (int i = 0; i < this->skeletons[skeletonID].jointCount; i++) {
+			joints[i] = this->joints[skeletonID][i];
+		}
+	}
 }

@@ -104,8 +104,11 @@ int main() {
 				}
 
 				if (mesh.hasSkeleton) {
+					Luna::Skeleton skel;
 					std::vector<Luna::Weights> weights;
+					std::vector<Luna::Joint> joints;
 					loader->reader.getWeights(mesh.id, weights);
+					loader->reader.getJoints(skel.skeletonID, joints);
 				}
 
 				delete loader;

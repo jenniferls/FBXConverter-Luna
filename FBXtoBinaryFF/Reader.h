@@ -31,7 +31,7 @@ private:
 	void GetMaterialData(FbxMesh* mesh, Exporter* exporter);
 	bool GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter);
 	void GetSkeletonData(FbxNode* node, Exporter* exporter);
-	void GetWeightsData(FbxMesh* fbxmesh, Luna::Skeleton& skel, Exporter* exporter);
+	void GetWeightsData(FbxMesh* fbxmesh, Luna::Skeleton& skel, unsigned int meshID, Exporter* exporter);
 
 	bool isBoundingBox(FbxNode* node);
 	bool hasSkeleton(FbxNode* node);

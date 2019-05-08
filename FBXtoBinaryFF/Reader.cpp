@@ -166,14 +166,18 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 	tempMesh.hasSkeleton = hasSkeleton(mesh->GetNode());
 	if (tempMesh.hasSkeleton) {
 		std::cout << "The mesh has a skeleton!" << std::endl; //Debug
+
 		Luna::Skeleton tempSkel;
+		tempSkel.skeletonID = tempMesh.id; //For now, just make the ID the same as the mesh to easily be able to find a matching skeleton
+
 		exporter->weights.push_back(new Luna::Weights[tempMesh.vertexCount]); //Create a container for all of the mesh weights
-		GetWeightsData(mesh, tempSkel, exporter); //Since we know that the mesh is skinned we can get the weights
+		GetWeightsData(mesh, tempSkel, tempMesh.id, exporter); //Since we know that the mesh is skinned we can get the weights
+
 		exporter->writer.skeletons.push_back(tempSkel);
 		exporter->writer.scene.skeletonCount += 1;
 	}
 
-	GetMaterialData(mesh, exporter); //Since it's a mesh if should have a material which we will get
+	GetMaterialData(mesh, exporter); //Since it's a mesh it should have a material which we will get
 	tempMesh.hasBoundingBox = GetBoundingBoxData(mesh, exporter);
 
 	exporter->writer.meshes.push_back(tempMesh);
@@ -322,15 +326,23 @@ void Reader::GetSkeletonData(FbxNode* node, Exporter* exporter) {
 	//exporter->writer.skeletons.resize(exporter->writer.scene.skeletonCount);
 }
 
-void Reader::GetWeightsData(FbxMesh* fbxmesh, Luna::Skeleton& skel, Exporter* exporter) {
+void Reader::GetWeightsData(FbxMesh* fbxmesh, Luna::Skeleton& skel, unsigned int meshID, Exporter* exporter) {
 	FbxSkin* skin = (FbxSkin*)fbxmesh->GetDeformer(0, FbxDeformer::eSkin);
 	if (skin) {
 		unsigned int jointCount = skin->GetClusterCount();
 		skel.jointCount = jointCount;
 		exporter->joints.push_back(new Luna::Joint[jointCount]);
+
 		for (int i = 0; i < jointCount; i++) {
 			FbxCluster* cluster = skin->GetCluster(i);
 			FbxNode* joint = cluster->GetLink();
+			std::string jointName = joint->GetName();
+			std::string parentJointName = joint->GetParent()->GetName();
+
+			exporter->joints[meshID][i].jointID = i;
+			memcpy(exporter->joints[meshID][i].jointName, jointName.c_str(), NAME_SIZE);
+			//exporter->joints[meshID][i].parentID = 
+
 			for (int j = 0; j < cluster->GetControlPointIndicesCount(); j++) {
 				float weight = cluster->GetControlPointWeights()[j];
 			}
