@@ -166,8 +166,10 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 	tempMesh.hasSkeleton = hasSkeleton(mesh->GetNode());
 	if (tempMesh.hasSkeleton) {
 		std::cout << "The mesh has a skeleton!" << std::endl; //Debug
+		Luna::Skeleton tempSkel;
 		exporter->weights.push_back(new Luna::Weights[tempMesh.vertexCount]); //Create a container for all of the mesh weights
-		GetWeightsData(mesh, exporter); //Since we know that the mesh is skinned we can get the weights
+		GetWeightsData(mesh, tempSkel, exporter); //Since we know that the mesh is skinned we can get the weights
+		exporter->writer.skeletons.push_back(tempSkel);
 		exporter->writer.scene.skeletonCount += 1;
 	}
 
@@ -317,13 +319,15 @@ bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
 }
 
 void Reader::GetSkeletonData(FbxNode* node, Exporter* exporter) {
-	exporter->writer.skeletons.resize(exporter->writer.scene.skeletonCount);
+	//exporter->writer.skeletons.resize(exporter->writer.scene.skeletonCount);
 }
 
-void Reader::GetWeightsData(FbxMesh* mesh, Exporter* exporter) {
-	FbxSkin* skin = (FbxSkin*)mesh->GetDeformer(0, FbxDeformer::eSkin);
+void Reader::GetWeightsData(FbxMesh* fbxmesh, Luna::Skeleton& skel, Exporter* exporter) {
+	FbxSkin* skin = (FbxSkin*)fbxmesh->GetDeformer(0, FbxDeformer::eSkin);
 	if (skin) {
 		unsigned int jointCount = skin->GetClusterCount();
+		skel.jointCount = jointCount;
+		exporter->joints.push_back(new Luna::Joint[jointCount]);
 		for (int i = 0; i < jointCount; i++) {
 			FbxCluster* cluster = skin->GetCluster(i);
 			FbxNode* joint = cluster->GetLink();
