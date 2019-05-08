@@ -19,6 +19,7 @@ public:
 	std::vector<Luna::Vertex*> meshVertices;
 	std::vector<Luna::Index*> meshIndices;
 	std::vector<Luna::Joint*> joints;
+	std::vector<Luna::Weights*> weights;
 
 private:
 	

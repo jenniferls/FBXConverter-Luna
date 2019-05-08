@@ -84,13 +84,6 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 	tempMesh.pos[0] = (float)mesh->GetNode()->LclTranslation.Get()[0];
 	tempMesh.pos[1] = (float)mesh->GetNode()->LclTranslation.Get()[1];
 	tempMesh.pos[2] = (float)mesh->GetNode()->LclTranslation.Get()[2];
-	tempMesh.hasSkeleton = hasSkeleton(mesh->GetNode());
-
-	if (tempMesh.hasSkeleton) {
-		std::cout << "The mesh has a skeleton!" << std::endl; //Debug
-		GetWeightsData(mesh, exporter);
-		exporter->writer.scene.skeletonCount += 1;
-	}
 
 	std::vector<int> vertIndices;
 	int vertIndexCount = mesh->GetPolygonVertexCount();
@@ -168,6 +161,14 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 
 	for (unsigned int i = 0; i < tempMesh.vertexCount; i++) { //Transfer the vertex information
 		exporter->meshVertices[tempMesh.id][i] = tempVertices[i];
+	}
+
+	tempMesh.hasSkeleton = hasSkeleton(mesh->GetNode());
+	if (tempMesh.hasSkeleton) {
+		std::cout << "The mesh has a skeleton!" << std::endl; //Debug
+		exporter->weights.push_back(new Luna::Weights[tempMesh.vertexCount]); //Create a container for all of the mesh weights
+		GetWeightsData(mesh, exporter); //Since we know that the mesh is skinned we can get the weights
+		exporter->writer.scene.skeletonCount += 1;
 	}
 
 	GetMaterialData(mesh, exporter); //Since it's a mesh if should have a material which we will get

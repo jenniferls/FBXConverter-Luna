@@ -19,6 +19,11 @@ Exporter::~Exporter() {
 		delete (this->joints[i]);
 	}
 	this->joints.clear();
+
+	for (int i = 0; i < this->weights.size(); i++) {
+		delete (this->weights[i]);
+	}
+	this->weights.clear();
 }
 
 Luna::Writer Exporter::getWriter() const {
@@ -53,6 +58,12 @@ void Exporter::WriteToBinary(const char* filename){
 
 		if (this->writer.meshes[i].hasBoundingBox) {
 			writer.write(outfile, this->writer.boundingBoxes[i]);
+		}
+
+		if (this->writer.meshes[i].hasSkeleton) {
+			for (int j = 0; j < this->writer.meshes[i].vertexCount; j++) {
+				writer.write(outfile, this->weights[i][j]);
+			}
 		}
 	}
 

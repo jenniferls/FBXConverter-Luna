@@ -103,6 +103,11 @@ int main() {
 					bbox = loader->reader.getBoundingBox(mesh.id);
 				}
 
+				if (mesh.hasSkeleton) {
+					std::vector<Luna::Weights> weights;
+					loader->reader.getWeights(mesh.id, weights);
+				}
+
 				delete loader;
 				break;
 			}

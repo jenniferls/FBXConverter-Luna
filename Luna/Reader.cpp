@@ -29,9 +29,15 @@ namespace Luna {
 			for (unsigned int j = 0; j < this->meshes[i].indexCount; j++) { //For every index in the mesh, read in index header
 				read(infile, this->meshIndices[i][j]); //One Index
 			}
-			if (this->meshes[i].hasBoundingBox) {
+			if (this->meshes[i].hasBoundingBox) { //If the mesh has a bounding box, read in its' bounding box
 				this->boundingBoxes.push_back(BoundingBox());
-				read(infile, this->boundingBoxes[i]);
+				read(infile, this->boundingBoxes[i]); //One bounding box
+			}
+			if (this->meshes[i].hasSkeleton) {
+				this->weights.push_back(new Weights[this->meshes[i].vertexCount]);
+				for (int j = 0; j < this->meshes[i].vertexCount; j++) {
+					read(infile, this->weights[i][j]);
+				}
 			}
 		}
 		this->materials.resize(this->materialCount);
