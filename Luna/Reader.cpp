@@ -17,7 +17,6 @@ namespace Luna {
 		read(infile, this->scene); //Read the scene header
 		this->meshCount = this->scene.meshCount;
 		this->materialCount = this->scene.materialCount;
-		this->skeletonCount = this->scene.skeletonCount;
 		this->meshes.resize(this->scene.meshCount);
 		for (unsigned int i = 0; i < this->scene.meshCount; i++) { //For every mesh in the scene, read in mesh header
 			read(infile, this->meshes[i]);
@@ -35,7 +34,7 @@ namespace Luna {
 			}
 			if (this->meshes[i].hasSkeleton) {
 				this->weights.push_back(new Weights[this->meshes[i].vertexCount]);
-				for (int j = 0; j < this->meshes[i].vertexCount; j++) {
+				for (unsigned int j = 0; j < this->meshes[i].vertexCount; j++) {
 					read(infile, this->weights[i][j]);
 				}
 			}
@@ -44,13 +43,10 @@ namespace Luna {
 		for (unsigned int i = 0; i < this->materialCount; i++) {
 			read(infile, this->materials[i]);
 		}
-		this->skeletons.resize(this->skeletonCount);
-		for (unsigned int i = 0; i < this->scene.skeletonCount; i++) {
-			read(infile, this->skeletons[i]);
-			this->joints.push_back(new Joint[this->skeletons[i].jointCount]);
-			for (unsigned int j = 0; j < this->skeletons[i].jointCount; j++) {
-				read(infile, this->joints[i][j]);
-			}
+		read(infile, this->skeleton);
+		this->joints.resize(this->skeleton.jointCount);
+		for (unsigned int i = 0; i < this->skeleton.jointCount; i++) {
+			read(infile, this->joints[i]);
 		}
 
 		infile.close();
@@ -103,9 +99,8 @@ namespace Luna {
 	void Reader::clean() {
 		this->meshCount = 0;
 		this->materialCount = 0;
-		this->skeletonCount = 0;
 		this->meshes.clear();
-		this->skeletons.clear();
+		this->joints.clear();
 
 		for (int i = 0; i < this->meshVertices.size(); i++) {
 			delete (this->meshVertices[i]);
@@ -116,11 +111,6 @@ namespace Luna {
 			delete (this->meshIndices[i]);
 		}
 		this->meshIndices.clear();
-
-		for (int i = 0; i < this->joints.size(); i++) {
-			delete (this->joints[i]);
-		}
-		this->joints.clear();
 
 		for (int i = 0; i < this->weights.size(); i++) {
 			delete (this->weights[i]);
@@ -136,12 +126,12 @@ namespace Luna {
 		return this->materialCount;
 	}
 
-	unsigned int Reader::getSkeletonCount() const {
-		return this->skeletonCount;
-	}
-
 	Mesh Reader::getMesh(int id) const {
 		return this->meshes[id];
+	}
+
+	Skeleton Reader::getSkeleton() const {
+		return this->skeleton;
 	}
 
 	void Reader::getVertices(int meshID, std::vector<Vertex>& vertices) {
@@ -173,10 +163,6 @@ namespace Luna {
 		return this->boundingBoxes[meshID];
 	}
 
-	Skeleton Reader::getSkeleton(int id) const {
-		return this->skeletons[id];
-	}
-
 	void Reader::getWeights(int meshID, std::vector<Weights>& weights) {
 		weights.resize(this->meshes[meshID].vertexCount);
 		for (unsigned int i = 0; i < this->meshes[meshID].vertexCount; i++) {
@@ -184,10 +170,10 @@ namespace Luna {
 		}
 	}
 
-	void Reader::getJoints(int skeletonID, std::vector<Joint>& joints) {
-		joints.resize(this->skeletons[skeletonID].jointCount);
-		for (int i = 0; i < this->skeletons[skeletonID].jointCount; i++) {
-			joints[i] = this->joints[skeletonID][i];
+	void Reader::getJoints(std::vector<Joint>& joints) {
+		joints.resize(this->skeleton.jointCount);
+		for (unsigned int i = 0; i < this->skeleton.jointCount; i++) {
+			joints[i] = this->joints[i];
 		}
 	}
 }

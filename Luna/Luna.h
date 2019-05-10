@@ -7,7 +7,6 @@ namespace Luna {
 
 	struct Scene {
 		unsigned int meshCount = 0;
-		unsigned int skeletonCount = 0;
 		unsigned int materialCount = 0;
 	};
 
@@ -72,7 +71,6 @@ namespace Luna {
 	};
 
 	struct Skeleton {
-		unsigned int skeletonID = 0;
 		unsigned int jointCount = 0;
 		unsigned int animationCount = 0;
 	};
@@ -80,7 +78,7 @@ namespace Luna {
 	struct Joint {
 		char jointName[NAME_SIZE] = "\0";
 		unsigned int jointID = 0;
-		unsigned int parentID = 0;
+		int parentID = -1;
 		float bindposeMatrix[4][4] = { 0.0f };
 	};
 

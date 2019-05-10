@@ -13,18 +13,17 @@ namespace Luna {
 
 		unsigned int getMeshCount() const;
 		unsigned int getMaterialCount() const;
-		unsigned int getSkeletonCount() const;
 
 		void getMeshes(std::vector<Mesh>& meshes);
 		Mesh getMesh(int id) const;
+		Skeleton getSkeleton() const;
 		void getVertices(int meshID, std::vector<Vertex>& vertices);
 		void getIndices(int meshID, std::vector<Index>& indices);
 		Material getMaterial(int meshID) const;
 		void getMaterials(std::vector<Material>& materials);
 		BoundingBox getBoundingBox(int meshID) const;
-		Skeleton getSkeleton(int id) const;
 		void getWeights(int meshID, std::vector<Weights>& weights); //The number of weights is equal to the number of vertices
-		void getJoints(int skeletonID, std::vector<Joint>& joints);
+		void getJoints(std::vector<Joint>& joints);
 		void getAnimation();
 
 	private:
@@ -43,17 +42,16 @@ namespace Luna {
 		void clean();
 
 		Scene scene;
+		Skeleton skeleton;
 		std::vector<Mesh> meshes;
+		std::vector<Joint> joints;
 		std::vector<Vertex*> meshVertices;
 		std::vector<Index*> meshIndices;
 		std::vector<Material> materials;
 		std::vector<BoundingBox> boundingBoxes;
-		std::vector<Skeleton> skeletons;
 		std::vector<Weights*> weights;
-		std::vector<Joint*> joints;
 
 		unsigned int meshCount;
 		unsigned int materialCount;
-		unsigned int skeletonCount;
 	};
 }

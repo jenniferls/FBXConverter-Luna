@@ -33,6 +33,8 @@ private:
 	void GetSkeletonData(FbxNode* node, Exporter* exporter);
 	void GetWeightsData(FbxMesh* fbxmesh, Luna::Skeleton& skel, unsigned int meshID, Exporter* exporter);
 
+	unsigned int GetJointIdByName(const char* jointName, Exporter* exporter, unsigned int meshID);
+
 	bool isBoundingBox(FbxNode* node);
 	bool hasSkeleton(FbxNode* node);
 	bool isTriangulated(FbxMesh* mesh);

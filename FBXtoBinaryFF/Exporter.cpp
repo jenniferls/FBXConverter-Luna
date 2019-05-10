@@ -15,11 +15,6 @@ Exporter::~Exporter() {
 	}
 	this->meshVertices.clear();
 
-	for (int i = 0; i < this->joints.size(); i++) {
-		delete (this->joints[i]);
-	}
-	this->joints.clear();
-
 	for (int i = 0; i < this->weights.size(); i++) {
 		delete (this->weights[i]);
 	}
@@ -36,7 +31,6 @@ void Exporter::WriteToBinary(const char* filename){
 
 	writer.write(outfile, this->writer.scene);
 	std::cout << "Amount of meshes: " << this->writer.scene.meshCount << std::endl;
-	std::cout << "Amount of skeletons: " << this->writer.scene.skeletonCount << std::endl;
 	std::cout << "Amount of materials: " << this->writer.scene.materialCount << std::endl;
 
 	for (unsigned int i = 0; i < this->writer.scene.meshCount; i++) {
@@ -61,7 +55,7 @@ void Exporter::WriteToBinary(const char* filename){
 		}
 
 		if (this->writer.meshes[i].hasSkeleton) {
-			for (int j = 0; j < this->writer.meshes[i].vertexCount; j++) {
+			for (unsigned int j = 0; j < this->writer.meshes[i].vertexCount; j++) {
 				writer.write(outfile, this->weights[i][j]);
 			}
 		}
@@ -81,16 +75,15 @@ void Exporter::WriteToBinary(const char* filename){
 		}
 	}
 
-	for (unsigned int i = 0; i < this->writer.scene.skeletonCount; i++) {
-		writer.write(outfile, this->writer.skeletons[i]);
-		std::cout << std::endl << "Skeleton " << i << std::endl;
-		std::cout << "ID: " << this->writer.skeletons[i].skeletonID << std::endl;
-		std::cout << "Amount of joints: " << this->writer.skeletons[i].jointCount << std::endl;
-		std::cout << "Amount of animations: " << this->writer.skeletons[i].animationCount << std::endl;
+	writer.write(outfile, this->writer.skeleton);
+	std::cout << std::endl << "Skeleton " << std::endl;
+	std::cout << "Amount of joints: " << this->writer.skeleton.jointCount << std::endl;
+	std::cout << "Amount of animations: " << this->writer.skeleton.animationCount << std::endl;
 
-		for (int j = 0; j < this->writer.skeletons[i].jointCount; j++) {
-			writer.write(outfile, this->joints[i][j]);
-		}
+	for (unsigned int i = 0; i < this->writer.skeleton.jointCount; i++) {
+		writer.write(outfile, this->joints[i]);
+		std::cout << "Joint " << i << std::endl;
+		std::cout << "Joint name: " << this->joints[i].jointName << std::endl;
 	}
 
 	outfile.close();

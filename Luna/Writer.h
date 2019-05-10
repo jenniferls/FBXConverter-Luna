@@ -35,10 +35,10 @@ namespace Luna {
 		void write(std::ofstream& outfile, BoundingBox& boundingBox);
 
 		Scene scene;
+		Skeleton skeleton;
 		std::vector<Mesh> meshes;
 		std::vector<Material> materials;
 		std::vector<BoundingBox> boundingBoxes;
-		std::vector<Skeleton> skeletons;
 
 	private:
 	

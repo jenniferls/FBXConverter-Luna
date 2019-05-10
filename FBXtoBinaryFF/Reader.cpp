@@ -53,7 +53,7 @@ void Reader::ConvertFBX(Exporter* exporter, const char* outPath){
 	this->outputPath = this->outputPath.remove_filename();
 
 	GetData(this->rootNode, exporter);
-	GetSkeletonData(this->rootNode, exporter);
+	//GetSkeletonData(this->rootNode, exporter);
 }
 
 void Reader::GetData(FbxNode* node, Exporter* exporter) {
@@ -66,10 +66,15 @@ void Reader::GetData(FbxNode* node, Exporter* exporter) {
 	}
 
 	FbxMesh* mesh = node->GetMesh();
+	//FbxSkeleton* skeleton = node->GetSkeleton();
 
 	if (mesh && !isBoundingBox(node)) { //If the node is a mesh that is not a bounding box
 		GetMeshData(mesh, exporter);
 	}
+
+	//if (skeleton) {
+	//	GetSkeletonData(skeleton, exporter);
+	//}
 }
 
 void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
@@ -167,14 +172,10 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 	if (tempMesh.hasSkeleton) {
 		std::cout << "The mesh has a skeleton!" << std::endl; //Debug
 
-		Luna::Skeleton tempSkel;
-		tempSkel.skeletonID = tempMesh.id; //For now, just make the ID the same as the mesh to easily be able to find a matching skeleton
+		GetSkeletonData(this->scene->GetRootNode(), exporter);
 
 		exporter->weights.push_back(new Luna::Weights[tempMesh.vertexCount]); //Create a container for all of the mesh weights
-		GetWeightsData(mesh, tempSkel, tempMesh.id, exporter); //Since we know that the mesh is skinned we can get the weights
-
-		exporter->writer.skeletons.push_back(tempSkel);
-		exporter->writer.scene.skeletonCount += 1;
+		GetWeightsData(mesh, exporter->writer.skeleton, tempMesh.id, exporter); //Since we know that the mesh is skinned we can get the weights
 	}
 
 	GetMaterialData(mesh, exporter); //Since it's a mesh it should have a material which we will get
@@ -273,7 +274,7 @@ bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
 			int maxY = 0;
 			int maxZ = 0;
 
-			for (int j = 1; j < vertCount; j++) {
+			for (unsigned int j = 1; j < vertCount; j++) {
 				FbxVector4 point = bBoxMesh->GetControlPointAt(j);
 				if (point[0] < bBoxMesh->GetControlPointAt(minX)[0])
 				{
@@ -323,7 +324,9 @@ bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
 }
 
 void Reader::GetSkeletonData(FbxNode* node, Exporter* exporter) {
-	//exporter->writer.skeletons.resize(exporter->writer.scene.skeletonCount);
+	//for (int i = 0; i < exporter->writer.scene.skeletonCount; i++) {
+	//	exporter->joints.push_back(new Luna::Joint[exporter->writer.skeletons[i].jointCount]);
+	//}
 }
 
 void Reader::GetWeightsData(FbxMesh* fbxmesh, Luna::Skeleton& skel, unsigned int meshID, Exporter* exporter) {
@@ -331,23 +334,35 @@ void Reader::GetWeightsData(FbxMesh* fbxmesh, Luna::Skeleton& skel, unsigned int
 	if (skin) {
 		unsigned int jointCount = skin->GetClusterCount();
 		skel.jointCount = jointCount;
-		exporter->joints.push_back(new Luna::Joint[jointCount]);
+		exporter->joints.resize(skel.jointCount);
 
-		for (int i = 0; i < jointCount; i++) {
+		for (unsigned int i = 0; i < jointCount; i++) {
 			FbxCluster* cluster = skin->GetCluster(i);
 			FbxNode* joint = cluster->GetLink();
+			FbxSkeleton* skeleton = joint->GetSkeleton();
 			std::string jointName = joint->GetName();
 			std::string parentJointName = joint->GetParent()->GetName();
 
-			exporter->joints[meshID][i].jointID = i;
-			memcpy(exporter->joints[meshID][i].jointName, jointName.c_str(), NAME_SIZE);
-			//exporter->joints[meshID][i].parentID = 
+			exporter->joints[i].jointID = i;
+			memcpy(exporter->joints[i].jointName, jointName.c_str(), NAME_SIZE);
+			exporter->joints[i].parentID = GetJointIdByName(parentJointName.c_str(), exporter, meshID);
 
 			for (int j = 0; j < cluster->GetControlPointIndicesCount(); j++) {
-				float weight = cluster->GetControlPointWeights()[j];
+				float weight = (float)cluster->GetControlPointWeights()[j];
 			}
 		}
 	}
+}
+
+unsigned int Reader::GetJointIdByName(const char* jointName, Exporter* exporter, unsigned int meshID) {
+	for (int i = 0; i < exporter->joints.size(); i++) {
+		//std::string currJointName = exporter->joints[meshID][i].jointName;
+		if (strcmp(exporter->joints[i].jointName, jointName) == 0) {
+			std::cout << "Match found!" << std::endl; //Debug
+			return exporter->joints[i].jointID;
+		}
+	}
+	return -1; //If the name isn't found, return -1
 }
 
 bool Reader::isBoundingBox(FbxNode* node) {

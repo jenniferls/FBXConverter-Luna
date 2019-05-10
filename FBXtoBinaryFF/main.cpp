@@ -108,7 +108,7 @@ int main() {
 					std::vector<Luna::Weights> weights;
 					std::vector<Luna::Joint> joints;
 					loader->reader.getWeights(mesh.id, weights);
-					loader->reader.getJoints(skel.skeletonID, joints);
+					loader->reader.getJoints(joints);
 				}
 
 				delete loader;
