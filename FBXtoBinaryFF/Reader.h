@@ -15,6 +15,13 @@ public:
 	void ConvertFBX(Exporter* exporter, const char* outPath);
 
 private:
+	typedef struct SkinData { //Temporary datatype for gathering weights
+		unsigned int jointID[4]{ 0 };
+		float		 weight[4]{ 0.0f };
+		int			 minWeightIndex = 0;
+		float		 minWeight = 0.0f;
+	} SkinData;
+
 	FbxManager* fbxManager;
 	FbxScene* scene;
 	FbxIOSettings* ioSettings;
@@ -31,7 +38,7 @@ private:
 	void GetMaterialData(FbxMesh* mesh, Exporter* exporter);
 	bool GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter);
 	void GetSkeletonData(FbxNode* node, Exporter* exporter);
-	void GetWeightsData(FbxMesh* fbxmesh, Luna::Skeleton& skel, unsigned int meshID, Exporter* exporter);
+	void GetWeightsData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter);
 
 	unsigned int GetJointIdByName(const char* jointName, Exporter* exporter, unsigned int meshID);
 

@@ -172,10 +172,10 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 	if (tempMesh.hasSkeleton) {
 		std::cout << "The mesh has a skeleton!" << std::endl; //Debug
 
-		GetSkeletonData(this->scene->GetRootNode(), exporter);
+		//GetSkeletonData(this->scene->GetRootNode(), exporter);
 
 		exporter->weights.push_back(new Luna::Weights[tempMesh.vertexCount]); //Create a container for all of the mesh weights
-		GetWeightsData(mesh, exporter->writer.skeleton, tempMesh.id, exporter); //Since we know that the mesh is skinned we can get the weights
+		GetWeightsData(mesh, tempMesh.id, exporter); //Since we know that the mesh is skinned we can get the weights
 	}
 
 	GetMaterialData(mesh, exporter); //Since it's a mesh it should have a material which we will get
@@ -329,17 +329,18 @@ void Reader::GetSkeletonData(FbxNode* node, Exporter* exporter) {
 	//}
 }
 
-void Reader::GetWeightsData(FbxMesh* fbxmesh, Luna::Skeleton& skel, unsigned int meshID, Exporter* exporter) {
+void Reader::GetWeightsData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter) {
 	FbxSkin* skin = (FbxSkin*)fbxmesh->GetDeformer(0, FbxDeformer::eSkin);
 	if (skin) {
 		unsigned int jointCount = skin->GetClusterCount();
-		skel.jointCount = jointCount;
-		exporter->joints.resize(skel.jointCount);
+		exporter->writer.skeleton.jointCount = jointCount;
+		exporter->joints.resize(jointCount);
+
+		std::vector<SkinData> tempData(fbxmesh->GetControlPointsCount());
 
 		for (unsigned int i = 0; i < jointCount; i++) {
 			FbxCluster* cluster = skin->GetCluster(i);
 			FbxNode* joint = cluster->GetLink();
-			FbxSkeleton* skeleton = joint->GetSkeleton();
 			std::string jointName = joint->GetName();
 			std::string parentJointName = joint->GetParent()->GetName();
 
@@ -347,8 +348,54 @@ void Reader::GetWeightsData(FbxMesh* fbxmesh, Luna::Skeleton& skel, unsigned int
 			memcpy(exporter->joints[i].jointName, jointName.c_str(), NAME_SIZE);
 			exporter->joints[i].parentID = GetJointIdByName(parentJointName.c_str(), exporter, meshID);
 
+			int* indices = cluster->GetControlPointIndices();
+			double* weights = cluster->GetControlPointWeights();
+
 			for (int j = 0; j < cluster->GetControlPointIndicesCount(); j++) {
+				SkinData& ctrlPnt = tempData[indices[j]];
+				if (weights[j] > ctrlPnt.minWeight) {
+					ctrlPnt.weight[ctrlPnt.minWeightIndex] = (float)weights[j];
+					ctrlPnt.jointID[ctrlPnt.minWeightIndex] = i;
+
+					int minID = 0;
+					float newMinWeight = ctrlPnt.weight[minID];
+					for (int k = 1; k < 4; k++) { //Find new minimum
+						if (ctrlPnt.weight[k] < newMinWeight) {
+							minID = k;
+							newMinWeight = ctrlPnt.weight[k];
+						}
+					}
+					ctrlPnt.minWeightIndex = minID;
+					ctrlPnt.minWeight = newMinWeight;
+				}
+
 				float weight = (float)cluster->GetControlPointWeights()[j];
+			}
+		}
+
+		int vertexId = 0;
+		for (int p = 0; p < fbxmesh->GetPolygonCount(); p++)
+		{
+			for (int v = 0; v < 3; v++)
+			{
+				int ctrlPointIdx = fbxmesh->GetPolygonVertex(p, v);
+				SkinData& data = tempData[ctrlPointIdx];
+				unsigned int* joints = data.jointID;
+				float* weights = data.weight;
+				Luna::Weights& weight = exporter->weights[meshID][vertexId];
+
+				weight.jointIDs[0] = joints[0];
+				weight.jointIDs[1] = joints[1];
+				weight.jointIDs[2] = joints[2];
+				weight.jointIDs[3] = joints[3];
+
+				//Normalizing weights just in case
+				float sumWeights  = weights[0] + weights[1] + weights[2] + weights[3];
+				weight.weights[0] = weights[0] / sumWeights;
+				weight.weights[1] = weights[1] / sumWeights;
+				weight.weights[2] = weights[2] / sumWeights;
+				weight.weights[3] = weights[3] / sumWeights;
+				vertexId++;
 			}
 		}
 	}
