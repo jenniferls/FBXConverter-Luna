@@ -23,10 +23,10 @@ namespace Luna {
 
 		void getVertices(int meshID, std::vector<Vertex>& vertices);
 		void getIndices(int meshID, std::vector<Index>& indices);
-		void getMaterials(std::vector<Material>& materials);
 		void getWeights(int meshID, std::vector<Weights>& weights); //The number of weights is equal to the number of vertices
+		void getKeyframes(int jointID, std::vector<Keyframe>& keyframes);
+		void getMaterials(std::vector<Material>& materials);
 		void getJoints(std::vector<Joint>& joints);
-		void getKeyframes(std::vector<Keyframe>& keyframes);
 
 		bool animationExist() const;
 
@@ -50,12 +50,12 @@ namespace Luna {
 		Animation animation;
 		std::vector<Mesh> meshes;
 		std::vector<Joint> joints;
+		std::vector<Material> materials;
+		std::vector<BoundingBox> boundingBoxes;
 		std::vector<Vertex*> meshVertices;
 		std::vector<Index*> meshIndices;
 		std::vector<Weights*> weights;
-		std::vector<Material> materials;
-		std::vector<BoundingBox> boundingBoxes;
-		std::vector<Keyframe> keyframes;
+		std::vector<Keyframe*> keyframes;
 
 		unsigned int meshCount;
 		unsigned int materialCount;

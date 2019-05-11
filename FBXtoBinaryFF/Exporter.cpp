@@ -19,6 +19,11 @@ Exporter::~Exporter() {
 		delete (this->weights[i]);
 	}
 	this->weights.clear();
+
+	for (int i = 0; i < this->keyframes.size(); i++) {
+		delete (this->keyframes[i]);
+	}
+	this->keyframes.clear();
 }
 
 Luna::Writer Exporter::getWriter() const {
@@ -78,6 +83,10 @@ void Exporter::WriteToBinary(const char* filename){
 	}
 
 	if (hasSkeleton) {
+		writer.write(outfile, this->writer.animation);
+		std::cout << std::endl << "Animation" << std::endl;
+		std::cout << "Name: " << this->writer.animation.animationName << std::endl;
+
 		writer.write(outfile, this->writer.skeleton);
 		std::cout << std::endl << "Skeleton " << std::endl;
 		std::cout << "Amount of joints: " << this->writer.skeleton.jointCount << std::endl;
@@ -86,11 +95,11 @@ void Exporter::WriteToBinary(const char* filename){
 			writer.write(outfile, this->joints[i]);
 			std::cout << "Joint " << i << std::endl;
 			std::cout << "Joint name: " << this->joints[i].jointName << std::endl;
-		}
 
-		writer.write(outfile, this->writer.animation);
-		std::cout << std::endl << "Animation" << std::endl;
-		std::cout << "Name: " << this->writer.animation.animationName << std::endl;
+			for (unsigned int j= 0; j < this->writer.animation.keyframeCount; j++) {
+				writer.write(outfile, this->keyframes[i][j]);
+			}
+		}
 	}
 
 	outfile.close();

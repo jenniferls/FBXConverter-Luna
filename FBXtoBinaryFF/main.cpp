@@ -115,7 +115,7 @@ int main() {
 					std::vector<Luna::Keyframe> frames;
 
 					loader->reader.getJoints(joints);
-					loader->reader.getKeyframes(frames);
+					loader->reader.getKeyframes(0, frames);
 				}
 
 				delete loader;

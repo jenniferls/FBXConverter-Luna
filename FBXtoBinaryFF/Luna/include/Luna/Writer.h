@@ -37,7 +37,6 @@ namespace Luna {
 		std::vector<Mesh> meshes;
 		std::vector<Material> materials;
 		std::vector<BoundingBox> boundingBoxes;
-		std::vector<Keyframe> keyframes;
 
 	private:
 	

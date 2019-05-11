@@ -78,7 +78,7 @@ namespace Luna {
 		char jointName[NAME_SIZE] = "\0";
 		unsigned int jointID = 0;
 		int parentID = -1;
-		float bindposeMatrix[4][4] = { 0.0f };
+		float invBindposeMatrix[4][4] = { 0.0f };
 	};
 
 	struct Animation {
@@ -90,7 +90,9 @@ namespace Luna {
 
 	struct Keyframe {
 		float timePosition = 0.0f;
-		float keyframeMatrix[4][4] = { 0.0f };
+		float translation[4] = { 0.0f };
+		float rotation[4] = { 0.0f };
+		float scale[4] = { 0.0f };
 	};
 
 	struct BoundingBox {

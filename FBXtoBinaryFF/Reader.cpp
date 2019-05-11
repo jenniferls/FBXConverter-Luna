@@ -413,16 +413,79 @@ void Reader::GetAnimationData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* e
 		FbxString takeName = currStack->GetName();
 		FbxTakeInfo* takeInfo = this->scene->GetTakeInfo(takeName);
 		FbxTime::EMode timeMode = this->scene->GetGlobalSettings().GetTimeMode();
-		exporter->writer.animation.fps = takeInfo->mLocalTimeSpan.GetDuration().GetFrameRate(timeMode);
 
 		FbxTime start = takeInfo->mLocalTimeSpan.GetStart();
 		FbxTime stop = takeInfo->mLocalTimeSpan.GetStop();
-		unsigned int start_frame = start.GetFrameCount(timeMode);
-		unsigned int end_frame = stop.GetFrameCount(timeMode);
+		unsigned int start_frame = (unsigned int)start.GetFrameCount(timeMode);
+		unsigned int end_frame = (unsigned int)stop.GetFrameCount(timeMode);
 
 		int keyframeCount = (end_frame + 1) - start_frame; // starts from 0
+		exporter->writer.animation.duration = (float)takeInfo->mLocalTimeSpan.GetDuration().GetSecondDouble();
+		exporter->writer.animation.fps = (float)takeInfo->mLocalTimeSpan.GetDuration().GetFrameRate(timeMode);
+		exporter->writer.animation.keyframeCount = keyframeCount;
 
+		int clusterCount = skin->GetClusterCount();
+		for (int i = 0; i < clusterCount; i++) {
+			FbxCluster* cluster = skin->GetCluster(i);
+			exporter->keyframes.push_back(new Luna::Keyframe[keyframeCount]);
 
+			std::string jointName = cluster->GetLink()->GetName();
+			// jIndex is the index of THIS joint and matches the index in the skeleton joints array.
+			unsigned int jointIndex = 0;
+			for (; jointIndex < exporter->writer.skeleton.jointCount; jointIndex++)
+			{
+				if (jointName.compare(exporter->joints[jointIndex].jointName) == 0){
+					break;
+				}
+			}
+
+			FbxAMatrix geometryTransform(
+				fbxmesh->GetNode()->GetGeometricTranslation(FbxNode::eSourcePivot),
+				fbxmesh->GetNode()->GetGeometricRotation(FbxNode::eSourcePivot),
+				fbxmesh->GetNode()->GetGeometricScaling(FbxNode::eSourcePivot));
+			FbxAMatrix meshGlobalTransform; cluster->GetTransformMatrix(meshGlobalTransform);
+			FbxAMatrix globalBindPoseTransform; cluster->GetTransformLinkMatrix(globalBindPoseTransform);
+
+			FbxAMatrix invGlobalBindPose = globalBindPoseTransform.Inverse() * meshGlobalTransform * geometryTransform; //Final inverse bindpose matrix
+			for (int row = 0; row < 4; row++) { //Transfer to joint
+				exporter->joints[jointIndex].invBindposeMatrix[row][0] = (float)invGlobalBindPose[row][0];
+				exporter->joints[jointIndex].invBindposeMatrix[row][1] = (float)invGlobalBindPose[row][1];
+				exporter->joints[jointIndex].invBindposeMatrix[row][2] = (float)invGlobalBindPose[row][2];
+				exporter->joints[jointIndex].invBindposeMatrix[row][3] = (float)invGlobalBindPose[row][3];
+			}
+
+			//Keyframes
+			for (unsigned int t = start_frame; t < (end_frame + 1); t++) //For all of the keyframes
+			{
+				Luna::Keyframe& keyframe = exporter->keyframes[i][t];
+				FbxTime curr;
+				curr.SetFrame(t, timeMode);
+
+				FbxAMatrix currentTransformOffset = fbxmesh->GetNode()->EvaluateGlobalTransform(curr) * geometryTransform;
+
+				FbxAMatrix localTransform = cluster->GetLink()->EvaluateLocalTransform(curr);
+				FbxVector4 translation = localTransform.GetT();
+				FbxQuaternion rotation = localTransform.GetQ();
+				FbxVector4 scale = localTransform.GetS();
+
+				exporter->keyframes[i][t].translation[0] = (float)translation[0];
+				exporter->keyframes[i][t].translation[1] = (float)translation[1];
+				exporter->keyframes[i][t].translation[2] = (float)translation[2];
+				exporter->keyframes[i][t].translation[3] = (float)translation[3];
+
+				exporter->keyframes[i][t].rotation[0] = (float)rotation[0];
+				exporter->keyframes[i][t].rotation[1] = (float)rotation[1];
+				exporter->keyframes[i][t].rotation[2] = (float)rotation[2];
+				exporter->keyframes[i][t].rotation[3] = (float)rotation[3];
+
+				exporter->keyframes[i][t].scale[0] = (float)scale[0];
+				exporter->keyframes[i][t].scale[1] = (float)scale[1];
+				exporter->keyframes[i][t].scale[2] = (float)scale[2];
+				exporter->keyframes[i][t].scale[3] = (float)scale[3];
+
+				exporter->keyframes[i][t].timePosition = (float)t;
+			}
+		}
 	}
 }
 

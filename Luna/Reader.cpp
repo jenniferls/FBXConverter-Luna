@@ -44,15 +44,15 @@ namespace Luna {
 			read(infile, this->materials[i]);
 		}
 		if (hasAnimation) {
+			read(infile, this->animation);
 			read(infile, this->skeleton);
 			this->joints.resize(this->skeleton.jointCount);
 			for (unsigned int i = 0; i < this->skeleton.jointCount; i++) {
 				read(infile, this->joints[i]);
-			}
-			read(infile, this->animation);
-			this->keyframes.resize(this->animation.keyframeCount);
-			for (unsigned int i = 0; i < this->animation.keyframeCount; i++) {
-				read(infile, this->keyframes[i]);
+				this->keyframes.push_back(new Keyframe[this->animation.keyframeCount]);
+				for (unsigned int j = 0; j < this->animation.keyframeCount; j++) {
+					read(infile, this->keyframes[i][j]);
+				}
 			}
 		}
 
@@ -109,7 +109,6 @@ namespace Luna {
 		this->hasAnimation = false;
 		this->meshes.clear();
 		this->joints.clear();
-		this->keyframes.clear();
 
 		for (int i = 0; i < this->meshVertices.size(); i++) {
 			delete (this->meshVertices[i]);
@@ -125,6 +124,11 @@ namespace Luna {
 			delete (this->weights[i]);
 		}
 		this->weights.clear();
+
+		for (int i = 0; i < this->keyframes.size(); i++) {
+			delete (this->keyframes[i]);
+		}
+		this->keyframes.clear();
 	}
 
 	unsigned int Reader::getMeshCount() const {
@@ -186,10 +190,10 @@ namespace Luna {
 		}
 	}
 
-	void Reader::getKeyframes(std::vector<Keyframe>& keyframes) {
+	void Reader::getKeyframes(int jointID, std::vector<Keyframe>& keyframes) {
 		keyframes.resize(this->animation.keyframeCount);
 		for (unsigned int i = 0; i < this->animation.keyframeCount; i++) {
-			keyframes[i] = this->keyframes[i];
+			keyframes[i] = this->keyframes[jointID][i];
 		}
 	}
 
