@@ -56,6 +56,13 @@ void Reader::ConvertFBX(Exporter* exporter, const char* outPath){
 	//GetSkeletonData(this->rootNode, exporter);
 }
 
+std::string Reader::InputAnimName() {
+	std::cout << "Please input a name for the animation: ";
+	std::string name;
+	std::getline(std::cin, name);
+	return name;
+}
+
 void Reader::GetData(FbxNode* node, Exporter* exporter) {
 	std::cout << std::endl; //Debug
 	std::cout << node->GetName() << std::endl; //Debug
@@ -176,6 +183,7 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 
 		exporter->weights.push_back(new Luna::Weights[tempMesh.vertexCount]); //Create a container for all of the mesh weights
 		GetWeightsData(mesh, tempMesh.id, exporter); //Since we know that the mesh is skinned we can get the weights
+		GetAnimationData(mesh, tempMesh.id, exporter);
 	}
 
 	GetMaterialData(mesh, exporter); //Since it's a mesh it should have a material which we will get
@@ -323,12 +331,6 @@ bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
 	return false;
 }
 
-void Reader::GetSkeletonData(FbxNode* node, Exporter* exporter) {
-	//for (int i = 0; i < exporter->writer.scene.skeletonCount; i++) {
-	//	exporter->joints.push_back(new Luna::Joint[exporter->writer.skeletons[i].jointCount]);
-	//}
-}
-
 void Reader::GetWeightsData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter) {
 	FbxSkin* skin = (FbxSkin*)fbxmesh->GetDeformer(0, FbxDeformer::eSkin);
 	if (skin) {
@@ -401,11 +403,32 @@ void Reader::GetWeightsData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exp
 	}
 }
 
+void Reader::GetAnimationData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter) {
+	FbxSkin* skin = (FbxSkin*)fbxmesh->GetDeformer(0, FbxDeformer::eSkin);
+	if (skin) {
+		std::string animName = InputAnimName();
+		memcpy(exporter->writer.animation.animationName, animName.c_str(), NAME_SIZE);
+
+		FbxAnimStack* currStack = this->scene->GetSrcObject<FbxAnimStack>(0); //Get the first animation
+		FbxString takeName = currStack->GetName();
+		FbxTakeInfo* takeInfo = this->scene->GetTakeInfo(takeName);
+		FbxTime::EMode timeMode = this->scene->GetGlobalSettings().GetTimeMode();
+		exporter->writer.animation.fps = takeInfo->mLocalTimeSpan.GetDuration().GetFrameRate(timeMode);
+
+		FbxTime start = takeInfo->mLocalTimeSpan.GetStart();
+		FbxTime stop = takeInfo->mLocalTimeSpan.GetStop();
+		unsigned int start_frame = start.GetFrameCount(timeMode);
+		unsigned int end_frame = stop.GetFrameCount(timeMode);
+
+		int keyframeCount = (end_frame + 1) - start_frame; // starts from 0
+
+
+	}
+}
+
 unsigned int Reader::GetJointIdByName(const char* jointName, Exporter* exporter, unsigned int meshID) {
 	for (int i = 0; i < exporter->joints.size(); i++) {
-		//std::string currJointName = exporter->joints[meshID][i].jointName;
 		if (strcmp(exporter->joints[i].jointName, jointName) == 0) {
-			std::cout << "Match found!" << std::endl; //Debug
 			return exporter->joints[i].jointID;
 		}
 	}

@@ -2,8 +2,7 @@
 
 namespace Luna {
 	Reader::Reader() {
-		//this->meshVertices = { nullptr };
-		//this->meshIndices = { nullptr };
+		this->hasAnimation = false;
 	}
 
 	Reader::~Reader() {
@@ -33,6 +32,7 @@ namespace Luna {
 				read(infile, this->boundingBoxes[i]); //One bounding box
 			}
 			if (this->meshes[i].hasSkeleton) {
+				this->hasAnimation = true;
 				this->weights.push_back(new Weights[this->meshes[i].vertexCount]);
 				for (unsigned int j = 0; j < this->meshes[i].vertexCount; j++) {
 					read(infile, this->weights[i][j]);
@@ -43,10 +43,17 @@ namespace Luna {
 		for (unsigned int i = 0; i < this->materialCount; i++) {
 			read(infile, this->materials[i]);
 		}
-		read(infile, this->skeleton);
-		this->joints.resize(this->skeleton.jointCount);
-		for (unsigned int i = 0; i < this->skeleton.jointCount; i++) {
-			read(infile, this->joints[i]);
+		if (hasAnimation) {
+			read(infile, this->skeleton);
+			this->joints.resize(this->skeleton.jointCount);
+			for (unsigned int i = 0; i < this->skeleton.jointCount; i++) {
+				read(infile, this->joints[i]);
+			}
+			read(infile, this->animation);
+			this->keyframes.resize(this->animation.keyframeCount);
+			for (unsigned int i = 0; i < this->animation.keyframeCount; i++) {
+				read(infile, this->keyframes[i]);
+			}
 		}
 
 		infile.close();
@@ -99,8 +106,10 @@ namespace Luna {
 	void Reader::clean() {
 		this->meshCount = 0;
 		this->materialCount = 0;
+		this->hasAnimation = false;
 		this->meshes.clear();
 		this->joints.clear();
+		this->keyframes.clear();
 
 		for (int i = 0; i < this->meshVertices.size(); i++) {
 			delete (this->meshVertices[i]);
@@ -175,5 +184,20 @@ namespace Luna {
 		for (unsigned int i = 0; i < this->skeleton.jointCount; i++) {
 			joints[i] = this->joints[i];
 		}
+	}
+
+	void Reader::getKeyframes(std::vector<Keyframe>& keyframes) {
+		keyframes.resize(this->animation.keyframeCount);
+		for (unsigned int i = 0; i < this->animation.keyframeCount; i++) {
+			keyframes[i] = this->keyframes[i];
+		}
+	}
+
+	bool Reader::animationExist() const {
+		return this->hasAnimation;
+	}
+
+	Animation Reader::getAnimation() const {
+		return this->animation;
 	}
 }

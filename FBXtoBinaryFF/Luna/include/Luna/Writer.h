@@ -9,9 +9,6 @@ namespace Luna {
 		Writer();
 		~Writer();
 
-		void setMeshName(unsigned int meshID, const char* name);
-		//void setMeshPosition(unsigned int meshID, float x, float y, float z);
-
 		void setVertexPosition(Vertex& vertex, float x, float y, float z);
 		void setVertexNormal(Vertex& vertex, float x, float y, float z);
 		void setVertexUV(Vertex& vertex, float x, float y);
@@ -36,9 +33,11 @@ namespace Luna {
 
 		Scene scene;
 		Skeleton skeleton;
+		Animation animation;
 		std::vector<Mesh> meshes;
 		std::vector<Material> materials;
 		std::vector<BoundingBox> boundingBoxes;
+		std::vector<Keyframe> keyframes;
 
 	private:
 	

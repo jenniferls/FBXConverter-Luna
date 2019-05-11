@@ -104,11 +104,18 @@ int main() {
 				}
 
 				if (mesh.hasSkeleton) {
-					Luna::Skeleton skel;
 					std::vector<Luna::Weights> weights;
-					std::vector<Luna::Joint> joints;
 					loader->reader.getWeights(mesh.id, weights);
+				}
+
+				if (loader->reader.animationExist()) {
+					Luna::Skeleton skel = loader->reader.getSkeleton();
+					Luna::Animation anim = loader->reader.getAnimation();
+					std::vector<Luna::Joint> joints;
+					std::vector<Luna::Keyframe> frames;
+
 					loader->reader.getJoints(joints);
+					loader->reader.getKeyframes(frames);
 				}
 
 				delete loader;

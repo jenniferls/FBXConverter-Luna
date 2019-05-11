@@ -14,17 +14,21 @@ namespace Luna {
 		unsigned int getMeshCount() const;
 		unsigned int getMaterialCount() const;
 
-		void getMeshes(std::vector<Mesh>& meshes);
 		Mesh getMesh(int id) const;
 		Skeleton getSkeleton() const;
+		Animation getAnimation() const;
+
+		Material getMaterial(int meshID) const;
+		BoundingBox getBoundingBox(int meshID) const;
+
 		void getVertices(int meshID, std::vector<Vertex>& vertices);
 		void getIndices(int meshID, std::vector<Index>& indices);
-		Material getMaterial(int meshID) const;
 		void getMaterials(std::vector<Material>& materials);
-		BoundingBox getBoundingBox(int meshID) const;
 		void getWeights(int meshID, std::vector<Weights>& weights); //The number of weights is equal to the number of vertices
 		void getJoints(std::vector<Joint>& joints);
-		void getAnimation();
+		void getKeyframes(std::vector<Keyframe>& keyframes);
+
+		bool animationExist() const;
 
 	private:
 		void read(std::ifstream& infile, Scene& scene);
@@ -43,15 +47,18 @@ namespace Luna {
 
 		Scene scene;
 		Skeleton skeleton;
+		Animation animation;
 		std::vector<Mesh> meshes;
 		std::vector<Joint> joints;
 		std::vector<Vertex*> meshVertices;
 		std::vector<Index*> meshIndices;
+		std::vector<Weights*> weights;
 		std::vector<Material> materials;
 		std::vector<BoundingBox> boundingBoxes;
-		std::vector<Weights*> weights;
+		std::vector<Keyframe> keyframes;
 
 		unsigned int meshCount;
 		unsigned int materialCount;
+		bool hasAnimation;
 	};
 }

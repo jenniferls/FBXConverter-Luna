@@ -13,6 +13,7 @@ public:
 
 	void LoadFBX(const char* filename);
 	void ConvertFBX(Exporter* exporter, const char* outPath);
+	std::string InputAnimName();
 
 private:
 	typedef struct SkinData { //Temporary datatype for gathering weights
@@ -37,8 +38,8 @@ private:
 	void GetMeshData(FbxMesh* mesh, Exporter* exporter);
 	void GetMaterialData(FbxMesh* mesh, Exporter* exporter);
 	bool GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter);
-	void GetSkeletonData(FbxNode* node, Exporter* exporter);
 	void GetWeightsData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter);
+	void GetAnimationData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter);
 
 	unsigned int GetJointIdByName(const char* jointName, Exporter* exporter, unsigned int meshID);
 

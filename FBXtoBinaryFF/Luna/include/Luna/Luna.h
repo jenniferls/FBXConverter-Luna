@@ -72,7 +72,6 @@ namespace Luna {
 
 	struct Skeleton {
 		unsigned int jointCount = 0;
-		unsigned int animationCount = 0;
 	};
 
 	struct Joint {
@@ -86,7 +85,6 @@ namespace Luna {
 		float fps = 0.0f;
 		float duration = 0.0f;
 		char animationName[NAME_SIZE] = "\0";
-		unsigned int animationID = 0;
 		unsigned int keyframeCount = 0;
 	};
 

@@ -9,17 +9,6 @@ namespace Luna {
 
 	}
 
-	void Writer::setMeshName(unsigned int meshID, const char* name) {
-		//const char* newName = name.c_str();
-		//this->meshes[meshID].name = newName;
-	}
-
-	//void Writer::setMeshPosition(unsigned int meshID, float x, float y, float z) {
-	//	this->meshes[meshID].pos[0] = x;
-	//	this->meshes[meshID].pos[1] = y;
-	//	this->meshes[meshID].pos[2] = z;
-	//}
-
 	void Writer::setVertexPosition(Vertex& vertex, float x, float y, float z) {
 		vertex.position[0] = x;
 		vertex.position[1] = y;
