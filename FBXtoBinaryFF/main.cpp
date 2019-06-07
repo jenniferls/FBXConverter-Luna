@@ -83,7 +83,7 @@ int main() {
 			}
 			case Commands::LOAD: {
 				std::string inputFile;
-				std::cout << std::endl << "---------- This option will print information from a Luna-file ----------" << std::endl;
+				std::cout << std::endl << "---------- This option will print information from a Luna-file ----------" << std::endl << std::endl;
 				std::cout << "Please input a source Luna-file path: ";
 				std::getline(std::cin, inputFile);
 

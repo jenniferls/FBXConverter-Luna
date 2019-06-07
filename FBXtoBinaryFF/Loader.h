@@ -1,6 +1,7 @@
 #pragma once
 #include "Luna/Luna.h"
 #include "Luna/Reader.h"
+#include <iostream>
 
 class Loader {
 public:
@@ -16,7 +17,6 @@ public:
 	std::vector<Luna::Vertex> vertices;
 	std::vector<Luna::Index> indices;
 	std::vector<Luna::Material> materials;
-	Luna::BoundingBox bbox;
 private:
 
 };
