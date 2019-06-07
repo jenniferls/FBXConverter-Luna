@@ -88,35 +88,7 @@ int main() {
 				std::getline(std::cin, inputFile);
 
 				Loader* loader = new Loader;
-				loader->reader.readFile(inputFile.c_str());
-				Luna::Mesh mesh;
-				std::vector<Luna::Vertex> vertices;
-				std::vector<Luna::Index> indices;
-				std::vector<Luna::Material> materials;
-				Luna::BoundingBox bbox;
-				loader->reader.getVertices(0, vertices);
-				loader->reader.getIndices(0, indices);
-				loader->reader.getMaterials(materials);
-
-				mesh = loader->reader.getMesh(0);
-				if (mesh.hasBoundingBox) {
-					bbox = loader->reader.getBoundingBox(mesh.id);
-				}
-
-				if (mesh.hasSkeleton) {
-					std::vector<Luna::Weights> weights;
-					loader->reader.getWeights(mesh.id, weights);
-				}
-
-				if (loader->reader.animationExist()) {
-					Luna::Skeleton skel = loader->reader.getSkeleton();
-					Luna::Animation anim = loader->reader.getAnimation();
-					std::vector<Luna::Joint> joints;
-					std::vector<Luna::Keyframe> frames;
-
-					loader->reader.getJoints(joints);
-					loader->reader.getKeyframes(0, frames);
-				}
+				loader->PrintData(inputFile.c_str());
 
 				delete loader;
 				break;

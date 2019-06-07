@@ -7,9 +7,16 @@ public:
 	Loader();
 	~Loader();
 
-	void PrintData();
+	void PrintData(const char* filePath);
 
 	Luna::Reader reader;
+
+	Luna::Scene scene;
+	Luna::Mesh mesh;
+	std::vector<Luna::Vertex> vertices;
+	std::vector<Luna::Index> indices;
+	std::vector<Luna::Material> materials;
+	Luna::BoundingBox bbox;
 private:
 
 };
