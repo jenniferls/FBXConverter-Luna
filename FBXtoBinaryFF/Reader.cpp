@@ -64,28 +64,23 @@ std::string Reader::InputAnimName() {
 }
 
 void Reader::GetData(FbxNode* node, Exporter* exporter) {
-	std::cout << std::endl; //Debug
-	std::cout << node->GetName() << std::endl; //Debug
-	std::cout << node->GetChildCount() << std::endl; //Debug
+	//std::cout << std::endl; //Debug
+	//std::cout << node->GetName() << std::endl; //Debug
+	//std::cout << node->GetChildCount() << std::endl; //Debug
 
 	for (int i = 0; i < node->GetChildCount(); i++) {
 		GetData(node->GetChild(i), exporter); //Recursive
 	}
 
 	FbxMesh* mesh = node->GetMesh();
-	//FbxSkeleton* skeleton = node->GetSkeleton();
 
 	if (mesh && !isBoundingBox(node)) { //If the node is a mesh that is not a bounding box
 		GetMeshData(mesh, exporter);
 	}
-
-	//if (skeleton) {
-	//	GetSkeletonData(skeleton, exporter);
-	//}
 }
 
 void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
-	std::cout << "This is a mesh!" << std::endl; //Debug
+	//std::cout << "This is a mesh!" << std::endl; //Debug
 	if (!isTriangulated(mesh)) {
 		throw("Error: The mesh is not triangulated!");
 	}
@@ -177,9 +172,7 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 
 	tempMesh.hasSkeleton = hasSkeleton(mesh->GetNode());
 	if (tempMesh.hasSkeleton) {
-		std::cout << "The mesh has a skeleton!" << std::endl; //Debug
-
-		//GetSkeletonData(this->scene->GetRootNode(), exporter);
+		//std::cout << "The mesh has a skeleton!" << std::endl; //Debug
 
 		exporter->weights.push_back(new Luna::Weights[tempMesh.vertexCount]); //Create a container for all of the mesh weights
 		GetWeightsData(mesh, tempMesh.id, exporter); //Since we know that the mesh is skinned we can get the weights
@@ -199,14 +192,14 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 		if (matCount != 1) { //Only one material per mesh is supported
 			throw("Error: More than one material found in mesh!");
 		}
-		std::cout << "Material found!" << std::endl; //Debug
+		//std::cout << "Material found!" << std::endl; //Debug
 
 		FbxSurfaceMaterial* material = mesh->GetNode()->GetMaterial(0);
 		Luna::Material tempMaterial;
 
 		FbxPropertyT<FbxDouble3> fbxProperty;
 		if (material->GetClassId().Is(FbxSurfacePhong::ClassId)) { //If it's a Phong material
-			std::cout << "The material is Phong." << std::endl; //Debug
+			//std::cout << "The material is Phong." << std::endl; //Debug
 			fbxProperty = ((FbxSurfacePhong*)material)->Ambient;
 			exporter->writer.setMaterialAmbient(tempMaterial, (float)fbxProperty.Get()[0], (float)fbxProperty.Get()[1], (float)fbxProperty.Get()[2]);
 			fbxProperty = ((FbxSurfacePhong*)material)->Diffuse;
@@ -229,7 +222,7 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 				std::experimental::filesystem::copy(diffTexPath, this->outputPath);
 			}
 			memcpy(tempMaterial.diffuseTexPath, diffTexPath.filename().string().c_str(), PATH_SIZE);
-			std::cout << diffTexPath.filename() << std::endl; //Debug
+			//std::cout << diffTexPath.filename() << std::endl; //Debug
 		}
 
 		if (normalMapCount > 0) {
@@ -239,7 +232,7 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 				std::experimental::filesystem::copy(normTexPath, this->outputPath);
 			}
 			memcpy(tempMaterial.normalTexPath, normTexPath.filename().string().c_str(), PATH_SIZE);
-			std::cout << normTexPath.filename() << std::endl; //Debug
+			//std::cout << normTexPath.filename() << std::endl; //Debug
 			tempMaterial.hasNormalMap = true;
 		}
 
@@ -250,7 +243,7 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 				std::experimental::filesystem::copy(glowTexPath, this->outputPath);
 			}
 			memcpy(tempMaterial.glowTexPath, glowTexPath.filename().string().c_str(), PATH_SIZE);
-			std::cout << glowTexPath.filename() << std::endl; //Debug
+			//std::cout << glowTexPath.filename() << std::endl; //Debug
 			tempMaterial.hasGlowMap = true;
 		}
 
@@ -263,7 +256,7 @@ bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
 	for (int i = 0; i < mesh->GetNode()->GetChildCount(); i++) {
 		FbxNode* child = mesh->GetNode()->GetChild(i);
 		if (isBoundingBox(child)) {
-			std::cout << "A bounding box was found!" << std::endl; //Debug
+			//std::cout << "A bounding box was found!" << std::endl; //Debug
 
 			Luna::BoundingBox tempBBox;
 

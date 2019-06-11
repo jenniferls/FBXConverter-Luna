@@ -45,6 +45,9 @@ void Loader::PrintData(const char* filePath) {
 
 		if (mesh.hasBoundingBox) {
 			Luna::BoundingBox bbox = reader.getBoundingBox(mesh.id);
+			std::cout << std::endl << "--- Bounding Box ---" << std::endl;
+			std::cout << "Half size: " << bbox.halfSize[0] << ", " << bbox.halfSize[1] << ", " << bbox.halfSize[2] << std::endl;
+			std::cout << "Position (offset): " << bbox.pos[0] << ", " << bbox.pos[1] << ", " << bbox.pos[2] << std::endl;
 		}
 
 		if (mesh.hasSkeleton) {
@@ -61,5 +64,17 @@ void Loader::PrintData(const char* filePath) {
 
 		reader.getJoints(joints);
 		reader.getKeyframes(0, frames);
+
+		std::cout << std::endl << "--- Skeleton ---" << std::endl;
+		std::cout << "Amount of joints: " << skel.jointCount << std::endl;
+		for (int i = 0; i < skel.jointCount; i++) {
+			std::cout << joints[i].jointName << std::endl;
+		}
+
+		std::cout << std::endl << "--- Animation ---" << std::endl;
+		std::cout << "Name: " << anim.animationName << std::endl;
+		std::cout << "Duration: " << anim.duration << " seconds" << std::endl;
+		std::cout << "FPS: " << anim.fps << std::endl;
+		std::cout << "Amount of keyframes: " << anim.keyframeCount << std::endl << std::endl;
 	}
 }
