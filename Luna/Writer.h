@@ -30,6 +30,7 @@ namespace Luna {
 		void write(std::ofstream& outfile, Animation& anim);
 		void write(std::ofstream& outfile, Keyframe& frame);
 		void write(std::ofstream& outfile, BoundingBox& boundingBox);
+		//void write(std::ofstream& outfile, Camera& camera);
 
 		Scene scene;
 		Skeleton skeleton;
