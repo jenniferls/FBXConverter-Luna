@@ -82,6 +82,7 @@ void Reader::GetData(FbxNode* node, Exporter* exporter) {
 void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 	//std::cout << "This is a mesh!" << std::endl; //Debug
 	if (!isTriangulated(mesh)) {
+		//triangulating(mesh, exporter);
 		throw("Error: The mesh is not triangulated!");
 	}
 	Luna::Mesh tempMesh; //Create temporary mesh and fill with info
@@ -517,8 +518,96 @@ bool Reader::isTriangulated(FbxMesh* mesh) {
 	for (int i = 0; i < mesh->GetPolygonCount() && isTriangle == true; i++) {
 		int polySize = mesh->GetPolygonSize(i);
 		if (polySize != 3) {
+
 			isTriangle = false;
 		}
 	}
 	return isTriangle;
+}
+
+void Reader::triangulating(FbxMesh* mesh, Exporter* exporter)
+{
+	int polygonCount = mesh->GetPolygonCount();
+	std::vector<Luna::Vertex> tempVertices; //Temporary vertex array 
+	Luna::Vertex vtx; //Temporary vertex
+	int nrOfVtx = 0, vtxIndex = 0;
+
+	for (int i = 0; i < polygonCount; i++)
+	{
+		int polygonSize = mesh->GetPolygonSize(i);
+		for (int j = 0; j < polygonSize; j++)
+		{
+			int controlPointIndex = mesh->GetPolygonVertex(i, j);
+			int textureUVIndex = mesh->GetTextureUVIndex(i, j);
+			if (j < 3)
+			{
+				FbxVector4 fbxPos = mesh->GetControlPointAt(controlPointIndex);
+				exporter->writer.setVertexPosition(vtx, (float)fbxPos[0], (float)fbxPos[1], (float)fbxPos[2]);
+
+				FbxVector2 fbxUV = mesh->GetElementUV()->GetDirectArray().GetAt(textureUVIndex);
+				exporter->writer.setVertexUV(vtx, (float)fbxUV[0], (float)fbxUV[1]);
+
+				FbxVector4 fbxNormal = mesh->GetElementNormal()->GetDirectArray().GetAt(vtxIndex);
+				exporter->writer.setVertexNormal(vtx, (float)fbxNormal[0], (float)fbxNormal[1], (float)fbxNormal[2]);
+
+				FbxVector4 fbxTangent = mesh->GetElementTangent()->GetDirectArray().GetAt(vtxIndex);
+				exporter->writer.setVertexTangent(vtx, (float)fbxTangent[0], (float)fbxTangent[1], (float)fbxTangent[2]);
+
+				FbxVector4 fbxBinormal = mesh->GetElementBinormal()->GetDirectArray().GetAt(vtxIndex);
+				exporter->writer.setVertexBiTangent(vtx, (float)fbxBinormal[0], (float)fbxBinormal[1], (float)fbxBinormal[2]);
+				tempVertices.push_back(vtx);
+				nrOfVtx++;
+			}
+			else
+			{
+				for (int k = 0; k < 3; k++)
+				{
+					int replaceJ, addOn;
+					switch (k)
+					{
+					case 0:
+						replaceJ = 0;
+						addOn = -j;
+						break;
+					case 1:
+						replaceJ = j-1;
+						addOn = -1;
+						break;
+					case 2:
+						replaceJ = j;
+						addOn = 0;
+						break;
+					default:
+						break;
+					}
+					controlPointIndex = mesh->GetPolygonVertex(i, replaceJ);
+					textureUVIndex = mesh->GetTextureUVIndex(i, replaceJ);
+
+					FbxVector4 fbxPos = mesh->GetControlPointAt(controlPointIndex);
+					exporter->writer.setVertexPosition(vtx, (float)fbxPos[0], (float)fbxPos[1], (float)fbxPos[2]);
+
+					FbxVector2 fbxUV = mesh->GetElementUV()->GetDirectArray().GetAt(textureUVIndex);
+					exporter->writer.setVertexUV(vtx, (float)fbxUV[0], (float)fbxUV[1]);
+
+					FbxVector4 fbxNormal = mesh->GetElementNormal()->GetDirectArray().GetAt(vtxIndex + addOn);
+					exporter->writer.setVertexNormal(vtx, (float)fbxNormal[0], (float)fbxNormal[1], (float)fbxNormal[2]);
+
+					FbxVector4 fbxTangent = mesh->GetElementTangent()->GetDirectArray().GetAt(vtxIndex + addOn);
+					exporter->writer.setVertexTangent(vtx, (float)fbxTangent[0], (float)fbxTangent[1], (float)fbxTangent[2]);
+
+					FbxVector4 fbxBinormal = mesh->GetElementBinormal()->GetDirectArray().GetAt(vtxIndex + addOn);
+					exporter->writer.setVertexBiTangent(vtx, (float)fbxBinormal[0], (float)fbxBinormal[1], (float)fbxBinormal[2]);
+					tempVertices.push_back(vtx);
+					nrOfVtx++;
+				}
+				vtxIndex++;
+			}
+		}
+	}
+		//
+		//Luna::Vertex tempVertex; //Temporary vertex
+		//for (int i = 0; i < vertIndexCount; i++) { //For every vertex
+		//	unsigned int currentVertIndex = vertIndices[i];
+		//	exporter->writer.setVertexBiTangent(tempVertex, (float)fbxBinormal[0], (float)fbxBinormal[1], (float)fbxBinormal[2]);
+		//	tempVertices.push_back(tempVertex);
 }

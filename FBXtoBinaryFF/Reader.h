@@ -46,4 +46,5 @@ private:
 	bool isBoundingBox(FbxNode* node);
 	bool hasSkeleton(FbxNode* node);
 	bool isTriangulated(FbxMesh* mesh);
+	void triangulating(FbxMesh* mesh, Exporter* exporter);
 };
