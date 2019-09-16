@@ -100,7 +100,7 @@ namespace Luna {
 		outfile.write((const char*)&boundingBox, sizeof(BoundingBox));
 	}
 
-	//void Writer::write(std::ofstream& outfile, Camera& camera) {
-	//	outfile.write((const char*)&camera, sizeof(Camera));
-	//}
+	void Writer::write(std::ofstream& outfile, Camera& camera) {
+		outfile.write((const char*)&camera, sizeof(Camera));
+	}
 }

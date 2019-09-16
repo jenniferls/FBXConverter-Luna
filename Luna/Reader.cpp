@@ -106,9 +106,9 @@ namespace Luna {
 		infile.read((char*)&boundingBox, sizeof(BoundingBox));
 	}
 
-	//void Reader::read(std::ifstream& infile, Camera& camera) {
-	//	infile.read((char*)&camera, sizeof(Camera));
-	//}
+	void Reader::read(std::ifstream& infile, Camera& camera) {
+		infile.read((char*)&camera, sizeof(Camera));
+	}
 
 	void Reader::clean() {
 		this->meshCount = 0;
@@ -212,7 +212,7 @@ namespace Luna {
 		return this->animation;
 	}
 
-	//Camera Reader::getCamera() const {
-	//	return this->camera;
-	//}
+	Camera Reader::getCamera() const {
+		return this->camera;
+	}
 }

@@ -102,13 +102,13 @@ namespace Luna {
 		float halfSize[3] = { 0.0f };
 	};
 
-	//struct Camera {
-	//	char cameraName[NAME_SIZE];
-	//	float camPos[3] = { 0.0f };
-	//	float upVector[3] = { 0.0f };
-	//	float direction[3] = { 0.0f };
-	//	float FoV = 0.0f;
-	//	float near = 0.0f;
-	//	float far = 0.0f;
-	//};
+	struct Camera {
+		char cameraName[NAME_SIZE];
+		float camPos[3] = { 0.0f };
+		float upVector[3] = { 0.0f };
+		float direction[3] = { 0.0f };
+		float FoV = 0.0f;
+		float near = 0.0f;
+		float far = 0.0f;
+	};
 }
