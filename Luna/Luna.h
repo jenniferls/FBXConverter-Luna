@@ -8,7 +8,7 @@ namespace Luna {
 	struct Scene {
 		unsigned int meshCount = 0;
 		unsigned int materialCount = 0;
-		//bool hasCamera = false;
+		bool hasCamera = false;
 	};
 
 	struct Mesh {

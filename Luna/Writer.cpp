@@ -57,7 +57,7 @@ namespace Luna {
 	}
 
 	void Writer::write(std::ofstream& outfile, Scene& scene) {
-		outfile.write((const char*)&scene, sizeof(Scene)/* - 3*/); //To avoid writing junk data
+		outfile.write((const char*)&scene, sizeof(Scene) - 3); //To avoid writing junk data
 	}
 
 	void Writer::write(std::ofstream& outfile, Mesh& mesh) {

@@ -16,9 +16,9 @@ namespace Luna {
 		read(infile, this->scene); //Read the scene header
 		this->meshCount = this->scene.meshCount;
 		this->materialCount = this->scene.materialCount;
-		//if (this->scene.hasCamera == true) {
-		//	read(infile, this->camera);
-		//}
+		if (this->scene.hasCamera == true) {
+			read(infile, this->camera);
+		}
 		this->meshes.resize(this->scene.meshCount);
 		for (unsigned int i = 0; i < this->scene.meshCount; i++) { //For every mesh in the scene, read in mesh header
 			read(infile, this->meshes[i]);
@@ -63,7 +63,7 @@ namespace Luna {
 	}
 
 	void Reader::read(std::ifstream& infile, Scene& scene){
-		infile.read((char*)&scene, sizeof(Scene)/* - 3*/);
+		infile.read((char*)&scene, sizeof(Scene) - 3);
 	}
 
 	void Reader::read(std::ifstream& infile, Mesh& mesh){

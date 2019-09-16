@@ -12,6 +12,7 @@ Loader::~Loader() {
 void Loader::PrintData(const char* filePath) {
 	reader.readFile(filePath);
 
+	std::cout << "Scene has camera: " << (scene.hasCamera ? "Yes" : "No") << std::endl;
 	std::cout << std::endl << "Amount of meshes: " << reader.getMeshCount() << std::endl << std::endl;
 
 	for (int i = 0; i < reader.getMeshCount(); i++) {
