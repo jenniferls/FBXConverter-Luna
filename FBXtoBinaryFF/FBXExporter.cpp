@@ -1,10 +1,10 @@
-#include "Exporter.h"
+#include "FBXExporter.h"
 
-Exporter::Exporter() {
+FBXExporter::FBXExporter() {
 
 }
 
-Exporter::~Exporter() {
+FBXExporter::~FBXExporter() {
 	for (int i = 0; i < this->meshVertices.size(); i++) {
 		delete (this->meshVertices[i]);
 	}
@@ -26,11 +26,11 @@ Exporter::~Exporter() {
 	this->keyframes.clear();
 }
 
-Luna::Writer Exporter::getWriter() const {
+Luna::Writer FBXExporter::getWriter() const {
 	return this->writer;
 }
 
-void Exporter::WriteToBinary(const char* filename){
+void FBXExporter::WriteToBinary(const char* filename){
 	std::cout << std::endl << "Writing to file..." << std::endl;
 
 	std::ofstream outfile(filename, std::ofstream::binary);

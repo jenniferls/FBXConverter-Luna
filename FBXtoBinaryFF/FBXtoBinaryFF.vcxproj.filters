@@ -18,24 +18,24 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FBXExporter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FBXLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FBXReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FBXExporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FBXExporter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FBXLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FBXReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXExporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
