@@ -346,6 +346,7 @@ bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
 		int maxY = 0;
 		int maxZ = 0;
 
+
 		for (int i = 0; i < mesh->GetControlPointsCount(); i++)
 		{
 			FbxVector4 point = mesh->GetControlPointAt(i);
