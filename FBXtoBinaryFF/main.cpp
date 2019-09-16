@@ -54,6 +54,11 @@ int main() {
 				std::experimental::filesystem::path outputPath = inputFile;
 				outputPath.replace_extension("lu");
 
+				std::string mappName = outputPath.string();
+				mappName.erase(mappName.end() - 3, mappName.end());
+				std::experimental::filesystem::create_directory(mappName);
+				outputPath = mappName + "/" + outputPath.filename().string();
+
 				Reader* reader = new Reader();
 				try {
 					reader->LoadFBX(inputFile.c_str());
@@ -65,6 +70,8 @@ int main() {
 				}
 				Exporter* exporter = new Exporter();
 				try {
+
+
 					reader->ConvertFBX(exporter, outputPath.string().c_str());
 					exporter->WriteToBinary(outputPath.string().c_str());
 				}
