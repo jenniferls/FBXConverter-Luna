@@ -223,7 +223,7 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 			const FbxFileTexture* diffTexture = FbxCast<FbxFileTexture>(diffuseProp.GetSrcObject<FbxFileTexture>(0));
 			std::experimental::filesystem::path diffTexPath = diffTexture->GetFileName();
 			if (std::experimental::filesystem::exists(diffTexPath)) {
-				std::experimental::filesystem::copy(diffTexPath, this->outputPath);
+				std::experimental::filesystem::copy(diffTexPath, this->outputPath, std::experimental::filesystem::copy_options::overwrite_existing);
 			}
 			memcpy(tempMaterial.diffuseTexPath, diffTexPath.filename().string().c_str(), PATH_SIZE);
 			//std::cout << diffTexPath.filename() << std::endl; //Debug
@@ -233,7 +233,7 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 			const FbxFileTexture* normTexture = FbxCast<FbxFileTexture>(normalProp.GetSrcObject<FbxFileTexture>(0));
 			std::experimental::filesystem::path normTexPath = normTexture->GetFileName();
 			if (std::experimental::filesystem::exists(normTexPath)) {
-				std::experimental::filesystem::copy(normTexPath, this->outputPath);
+				std::experimental::filesystem::copy(normTexPath, this->outputPath, std::experimental::filesystem::copy_options::overwrite_existing);
 			}
 			memcpy(tempMaterial.normalTexPath, normTexPath.filename().string().c_str(), PATH_SIZE);
 			//std::cout << normTexPath.filename() << std::endl; //Debug
@@ -244,7 +244,7 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 			const FbxFileTexture* glowTexture = FbxCast<FbxFileTexture>(glowProp.GetSrcObject<FbxFileTexture>(0));
 			std::experimental::filesystem::path glowTexPath = glowTexture->GetFileName();
 			if (std::experimental::filesystem::exists(glowTexPath)) {
-				std::experimental::filesystem::copy(glowTexPath, this->outputPath);
+				std::experimental::filesystem::copy(glowTexPath, this->outputPath, std::experimental::filesystem::copy_options::overwrite_existing);
 			}
 			memcpy(tempMaterial.glowTexPath, glowTexPath.filename().string().c_str(), PATH_SIZE);
 			//std::cout << glowTexPath.filename() << std::endl; //Debug
