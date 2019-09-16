@@ -12,6 +12,19 @@ Loader::~Loader() {
 void Loader::PrintData(const char* filePath) {
 	reader.readFile(filePath);
 
+	std::cout << "Scene has camera: " << (scene.hasCamera ? "Yes" : "No") << std::endl;
+	if (scene.hasCamera) {
+		Luna::Camera cam = reader.getCamera();
+
+		std::cout << "--- Camera ---" << std::endl;
+		std::cout << "Camera name: " << cam.cameraName << std::endl;
+		std::cout << "Camera position: " << cam.camPos[0] << ", " << cam.camPos[1] << ", " << cam.camPos[2] << std::endl;
+		std::cout << "Camera direction: " << cam.direction[0] << ", " << cam.direction[1] << ", " << cam.direction[2] << std::endl;
+		std::cout << "Camera up-vector" << cam.upVector[0] << ", " << cam.upVector[1] << ", " << cam.upVector[2] << std::endl;
+		std::cout << "Far plane: " << cam.far << std::endl;
+		std::cout << "Near plane: " << cam.near << std::endl;
+		std::cout << "Field-of-view: " << cam.FoV << std::endl;
+	}
 	std::cout << std::endl << "Amount of meshes: " << reader.getMeshCount() << std::endl << std::endl;
 
 	for (int i = 0; i < reader.getMeshCount(); i++) {
