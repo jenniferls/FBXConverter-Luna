@@ -220,7 +220,7 @@ public:
 
 /** FBX header information used at beginning of the FBX file
 * to get or set important values like the file format version number (mFileVersion).
-* The file version number will be used to select a particular Reader or Writer.
+* The file version number will be used to select a particular FBXReader or Writer.
 * \nosubgrouping */
 class FBXSDK_DLL FbxIOFileHeaderInfo
 {
