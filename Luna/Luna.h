@@ -8,6 +8,7 @@ namespace Luna {
 	struct Scene {
 		unsigned int meshCount = 0;
 		unsigned int materialCount = 0;
+		//bool hasCamera = false;
 	};
 
 	struct Mesh {
@@ -59,6 +60,7 @@ namespace Luna {
 		float ambientVal[3] = { 0.0f };
 		float specularVal[3] = { 0.0f };
 		char diffuseTexPath[PATH_SIZE] = "\0";
+		char specularTexPath[PATH_SIZE] = "\0";
 		char normalTexPath[PATH_SIZE] = "\0";
 		char glowTexPath[PATH_SIZE] = "\0";
 		bool hasNormalMap = false;
@@ -99,4 +101,14 @@ namespace Luna {
 		float pos[3] = { 0.0f };
 		float halfSize[3] = { 0.0f };
 	};
+
+	//struct Camera {
+	//	char cameraName[NAME_SIZE];
+	//	float camPos[3] = { 0.0f };
+	//	float upVector[3] = { 0.0f };
+	//	float direction[3] = { 0.0f };
+	//	float FoV = 0.0f;
+	//	float near = 0.0f;
+	//	float far = 0.0f;
+	//};
 }
