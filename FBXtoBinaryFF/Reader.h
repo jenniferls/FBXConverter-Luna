@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <string>
 #include <FBXSDK/include/fbxsdk.h>
 
 class Reader {

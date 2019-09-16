@@ -59,6 +59,7 @@ namespace Luna {
 		float ambientVal[3] = { 0.0f };
 		float specularVal[3] = { 0.0f };
 		char diffuseTexPath[PATH_SIZE] = "\0";
+		char specularTexPath[PATH_SIZE] = "\0";
 		char normalTexPath[PATH_SIZE] = "\0";
 		char glowTexPath[PATH_SIZE] = "\0";
 		bool hasNormalMap = false;

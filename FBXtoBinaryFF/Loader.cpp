@@ -34,6 +34,7 @@ void Loader::PrintData(const char* filePath) {
 		std::cout << "Ambient color: " << mat.ambientVal[0] << ", " << mat.ambientVal[1] << ", " << mat.ambientVal[2] << std::endl;
 		std::cout << "Specular color: " << mat.specularVal[0] << ", " << mat.specularVal[1] << ", " << mat.specularVal[2] << std::endl;
 		std::cout << "Diffuse texture: " << mat.diffuseTexPath << std::endl;
+		std::cout << "Specular texture: " << mat.specularTexPath << std::endl;
 		std::cout << "Has normal map: " << (mat.hasNormalMap ? "Yes" : "No") << std::endl;
 		if (mat.hasNormalMap) {
 			std::cout << "Normal map texture: " << mat.normalTexPath << std::endl;

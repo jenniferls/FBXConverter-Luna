@@ -210,6 +210,8 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 
 		FbxProperty diffuseProp = material->FindProperty(FbxSurfaceMaterial::sDiffuse);
 		unsigned int diffuseMapCount = diffuseProp.GetSrcObjectCount<FbxFileTexture>();
+		FbxProperty specularProp = material->FindProperty(FbxSurfaceMaterial::sSpecular);
+		unsigned int specularMapCount = specularProp.GetSrcObjectCount<FbxFileTexture>();
 		FbxProperty normalProp = material->FindProperty(FbxSurfaceMaterial::sNormalMap);
 		unsigned int normalMapCount = normalProp.GetSrcObjectCount<FbxFileTexture>();
 		FbxProperty glowProp = material->FindProperty(FbxSurfaceMaterial::sEmissive);
@@ -222,7 +224,17 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 				std::experimental::filesystem::copy(diffTexPath, this->outputPath);
 			}
 			memcpy(tempMaterial.diffuseTexPath, diffTexPath.filename().string().c_str(), PATH_SIZE);
-			//std::cout << diffTexPath.filename() << std::endl; //Debug
+			std::cout << diffTexPath.filename() << std::endl; //Debug
+		}
+
+		if (specularMapCount > 0) {
+			const FbxFileTexture* specTexture = FbxCast<FbxFileTexture>(specularProp.GetSrcObject<FbxFileTexture>(0));
+			std::experimental::filesystem::path specTexPath = specTexture->GetFileName();
+			if (std::experimental::filesystem::exists(specTexPath)) {
+				std::experimental::filesystem::copy(specTexPath, this->outputPath);
+			}
+			memcpy(tempMaterial.specularTexPath, specTexPath.filename().string().c_str(), PATH_SIZE);
+			std::cout << specTexPath.filename() << std::endl; // Debug
 		}
 
 		if (normalMapCount > 0) {
@@ -232,7 +244,7 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 				std::experimental::filesystem::copy(normTexPath, this->outputPath);
 			}
 			memcpy(tempMaterial.normalTexPath, normTexPath.filename().string().c_str(), PATH_SIZE);
-			//std::cout << normTexPath.filename() << std::endl; //Debug
+			std::cout << normTexPath.filename() << std::endl; //Debug
 			tempMaterial.hasNormalMap = true;
 		}
 
