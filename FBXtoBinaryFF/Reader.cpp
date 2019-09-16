@@ -81,10 +81,6 @@ void Reader::GetData(FbxNode* node, Exporter* exporter) {
 
 void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 	//std::cout << "This is a mesh!" << std::endl; //Debug
-	if (!isTriangulated(mesh)) {
-		//triangulating(mesh, exporter);
-		throw("Error: The mesh is not triangulated!");
-	}
 	Luna::Mesh tempMesh; //Create temporary mesh and fill with info
 
 	memcpy(tempMesh.name, mesh->GetNode()->GetName(), NAME_SIZE);
@@ -119,42 +115,49 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 	//std::vector<Luna::Index> tempIndices;
 
 	Luna::Vertex tempVertex; //Temporary vertex
-	for (int i = 0; i < vertIndexCount; i++) { //For every vertex
-		unsigned int currentVertIndex = vertIndices[i];
+	if (!isTriangulated(mesh)) {
+		triangulating(mesh, exporter, &tempVertices);
+		//throw("Error: The mesh is not triangulated!");
+	}
+	else
+	{
+		for (int i = 0; i < vertIndexCount; i++) { //For every vertex
+			unsigned int currentVertIndex = vertIndices[i];
 
-		FbxVector4 fbxPos = mesh->GetControlPointAt(currentVertIndex);
-		exporter->writer.setVertexPosition(tempVertex, (float)fbxPos[0], (float)fbxPos[1], (float)fbxPos[2]);
+			FbxVector4 fbxPos = mesh->GetControlPointAt(currentVertIndex);
+			exporter->writer.setVertexPosition(tempVertex, (float)fbxPos[0], (float)fbxPos[1], (float)fbxPos[2]);
 
-		exporter->writer.setVertexNormal(tempVertex, (float)fbxNormals.GetAt(i)[0], (float)fbxNormals.GetAt(i)[1], (float)fbxNormals.GetAt(i)[2]);
+			exporter->writer.setVertexNormal(tempVertex, (float)fbxNormals.GetAt(i)[0], (float)fbxNormals.GetAt(i)[1], (float)fbxNormals.GetAt(i)[2]);
 
-		FbxVector2 fbxUV = mesh->GetElementUV()->GetDirectArray().GetAt(fbxUVIndices.at(i));
-		exporter->writer.setVertexUV(tempVertex, (float)fbxUV[0], (float)fbxUV[1]);
+			FbxVector2 fbxUV = mesh->GetElementUV()->GetDirectArray().GetAt(fbxUVIndices.at(i));
+			exporter->writer.setVertexUV(tempVertex, (float)fbxUV[0], (float)fbxUV[1]);
 
-		FbxVector4 fbxTangent = mesh->GetElementTangent()->GetDirectArray().GetAt(i);
-		exporter->writer.setVertexTangent(tempVertex, (float)fbxTangent[0], (float)fbxTangent[1], (float)fbxTangent[2]);
+			FbxVector4 fbxTangent = mesh->GetElementTangent()->GetDirectArray().GetAt(i);
+			exporter->writer.setVertexTangent(tempVertex, (float)fbxTangent[0], (float)fbxTangent[1], (float)fbxTangent[2]);
 
-		FbxVector4 fbxBinormal = mesh->GetElementBinormal()->GetDirectArray().GetAt(i);
-		exporter->writer.setVertexBiTangent(tempVertex, (float)fbxBinormal[0], (float)fbxBinormal[1], (float)fbxBinormal[2]);
+			FbxVector4 fbxBinormal = mesh->GetElementBinormal()->GetDirectArray().GetAt(i);
+			exporter->writer.setVertexBiTangent(tempVertex, (float)fbxBinormal[0], (float)fbxBinormal[1], (float)fbxBinormal[2]);
 
-		//bool isDuplicate = false;
-		//for (int j = 0; j < tempVertices.size() && !isDuplicate; j++) { //Test for duplicate vertices, this is done as a means of optimization used together with indexed rendering
-		//	if (tempVertices.at(j) == tempVertex) { //If the contents of both vertices are the same
-		//		isDuplicate = true;
+			//bool isDuplicate = false;
+			//for (int j = 0; j < tempVertices.size() && !isDuplicate; j++) { //Test for duplicate vertices, this is done as a means of optimization used together with indexed rendering
+			//	if (tempVertices.at(j) == tempVertex) { //If the contents of both vertices are the same
+			//		isDuplicate = true;
 
-		//		Luna::Index tempIndex;
-		//		tempIndex.vertIndex = j;
-		//		tempIndices.push_back(tempIndex);
-		//	}
-		//}
-		//if (!isDuplicate) {
-		//	tempVertices.push_back(tempVertex);
+			//		Luna::Index tempIndex;
+			//		tempIndex.vertIndex = j;
+			//		tempIndices.push_back(tempIndex);
+			//	}
+			//}
+			//if (!isDuplicate) {
+			//	tempVertices.push_back(tempVertex);
 
-		//	Luna::Index tempIndex;
-		//	tempIndex.vertIndex = (unsigned int)tempVertices.size(); //Current size of array
-		//	tempIndices.push_back(tempIndex);
-		//}
+			//	Luna::Index tempIndex;
+			//	tempIndex.vertIndex = (unsigned int)tempVertices.size(); //Current size of array
+			//	tempIndices.push_back(tempIndex);
+			//}
 
-		tempVertices.push_back(tempVertex);
+			tempVertices.push_back(tempVertex);
+		}
 	}
 
 	tempMesh.vertexCount = (unsigned int)tempVertices.size(); //Set the new vertex count
@@ -525,7 +528,7 @@ bool Reader::isTriangulated(FbxMesh* mesh) {
 	return isTriangle;
 }
 
-void Reader::triangulating(FbxMesh* mesh, Exporter* exporter)
+void Reader::triangulating(FbxMesh* mesh, Exporter* exporter, std::vector<Luna::Vertex> * vertices)
 {
 	int polygonCount = mesh->GetPolygonCount();
 	std::vector<Luna::Vertex> tempVertices; //Temporary vertex array 
@@ -603,11 +606,8 @@ void Reader::triangulating(FbxMesh* mesh, Exporter* exporter)
 				vtxIndex++;
 			}
 		}
+
 	}
-		//
-		//Luna::Vertex tempVertex; //Temporary vertex
-		//for (int i = 0; i < vertIndexCount; i++) { //For every vertex
-		//	unsigned int currentVertIndex = vertIndices[i];
-		//	exporter->writer.setVertexBiTangent(tempVertex, (float)fbxBinormal[0], (float)fbxBinormal[1], (float)fbxBinormal[2]);
-		//	tempVertices.push_back(tempVertex);
+	//
+	*vertices = tempVertices;
 }
