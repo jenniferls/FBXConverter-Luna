@@ -253,12 +253,17 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 }
 
 bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
+	
+	Luna::BoundingBox tempBBox;
+
+	bool exist = false;
+
 	for (int i = 0; i < mesh->GetNode()->GetChildCount(); i++) {
 		FbxNode* child = mesh->GetNode()->GetChild(i);
 		if (isBoundingBox(child)) {
 			//std::cout << "A bounding box was found!" << std::endl; //Debug
 
-			Luna::BoundingBox tempBBox;
+			exist = true;
 
 			tempBBox.pos[0] = (float)child->LclTranslation.Get()[0]; //Offsets in case the mesh is not created at origo
 			tempBBox.pos[1] = (float)child->LclTranslation.Get()[1];
@@ -289,7 +294,6 @@ bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
 				{
 					minZ = j;
 				}
-
 				if (point[0] > bBoxMesh->GetControlPointAt(maxX)[0])
 				{
 					maxX = j;
@@ -320,7 +324,70 @@ bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
 			exporter->writer.boundingBoxes.push_back(tempBBox);
 			return true;
 		}
+		
 	}
+
+	if (!exist)
+	{
+		int minX = 0;
+		int minY = 0;
+		int minZ = 0;
+		int maxX = 0;
+		int maxY = 0;
+		int maxZ = 0;
+
+		for (int i = 0; i < mesh->GetControlPointsCount(); i++)
+		{
+			FbxVector4 point = mesh->GetControlPointAt(i);
+
+			if (point[0] < mesh->GetControlPointAt(minX)[0])
+			{
+				minX = i;
+			}
+			if (point[1] < mesh->GetControlPointAt(minY)[1])
+			{
+				minY = i;
+			}
+			if (point[2] < mesh->GetControlPointAt(minZ)[2])
+			{
+				minZ = i;
+			}
+			if (point[0] > mesh->GetControlPointAt(maxX)[0])
+			{
+				maxX = i;
+			}
+			if (point[1] > mesh->GetControlPointAt(maxY)[1])
+			{
+				maxY = i;
+			}
+			if (point[2] > mesh->GetControlPointAt(maxZ)[2])
+			{
+				maxZ = i;
+			}
+		}
+
+		double max[3];
+		double min[3];
+		max[0] = mesh->GetControlPointAt(maxX)[0];
+		max[1] = mesh->GetControlPointAt(maxY)[1];
+		max[2] = mesh->GetControlPointAt(maxZ)[2];
+		min[0] = mesh->GetControlPointAt(minX)[0];
+		min[1] = mesh->GetControlPointAt(minY)[1];
+		min[2] = mesh->GetControlPointAt(minZ)[2];
+
+		tempBBox.pos[0] = (float)max[0];
+		tempBBox.pos[1] = (float)max[1];
+		tempBBox.pos[2] = (float)max[2];
+
+		tempBBox.halfSize[0] = (float)max[0] / 2;
+		tempBBox.halfSize[1] = (float)max[1] / 2;
+		tempBBox.halfSize[2] = (float)max[2] / 2;
+
+		exporter->writer.boundingBoxes.push_back(tempBBox);
+
+		return true;
+	}
+
 	return false;
 }
 
