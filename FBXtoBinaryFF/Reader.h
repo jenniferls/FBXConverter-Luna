@@ -42,10 +42,11 @@ private:
 	void GetWeightsData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter);
 	void GetAnimationData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter);
 
+	void Triangulate(FbxMesh* mesh, Exporter* exporter, std::vector<Luna::Vertex>* vertices);
+
 	unsigned int GetJointIdByName(const char* jointName, Exporter* exporter, unsigned int meshID);
 
 	bool isBoundingBox(FbxNode* node);
 	bool hasSkeleton(FbxNode* node);
 	bool isTriangulated(FbxMesh* mesh);
-	void triangulating(FbxMesh* mesh, Exporter* exporter,std::vector<Luna::Vertex>* vertices);
 };

@@ -77,6 +77,11 @@ void Reader::GetData(FbxNode* node, Exporter* exporter) {
 	if (mesh && !isBoundingBox(node)) { //If the node is a mesh that is not a bounding box
 		GetMeshData(mesh, exporter);
 	}
+
+	////Psuedocode
+	//if (isCamera) {
+	//	//Get camera info
+	//}
 }
 
 void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
@@ -116,11 +121,10 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 
 	Luna::Vertex tempVertex; //Temporary vertex
 	if (!isTriangulated(mesh)) {
-		triangulating(mesh, exporter, &tempVertices);
+		Triangulate(mesh, exporter, &tempVertices);
 		//throw("Error: The mesh is not triangulated!");
 	}
-	else
-	{
+	else {
 		for (int i = 0; i < vertIndexCount; i++) { //For every vertex
 			unsigned int currentVertIndex = vertIndices[i];
 
@@ -540,7 +544,7 @@ bool Reader::isTriangulated(FbxMesh* mesh) {
 	return isTriangle;
 }
 
-void Reader::triangulating(FbxMesh* mesh, Exporter* exporter, std::vector<Luna::Vertex> * vertices)
+void Reader::Triangulate(FbxMesh* mesh, Exporter* exporter, std::vector<Luna::Vertex>* vertices)
 {
 	int polygonCount = mesh->GetPolygonCount();
 	std::vector<Luna::Vertex> tempVertices; //Temporary vertex array 
@@ -618,8 +622,6 @@ void Reader::triangulating(FbxMesh* mesh, Exporter* exporter, std::vector<Luna::
 				vtxIndex++;
 			}
 		}
-
 	}
-	//
 	*vertices = tempVertices;
 }
