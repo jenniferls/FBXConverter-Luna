@@ -235,7 +235,7 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 			const FbxFileTexture* specTexture = FbxCast<FbxFileTexture>(specularProp.GetSrcObject<FbxFileTexture>(0));
 			std::experimental::filesystem::path specTexPath = specTexture->GetFileName();
 			if (std::experimental::filesystem::exists(specTexPath)) {
-				std::experimental::filesystem::copy(specTexPath, this->outputPath);
+				std::experimental::filesystem::copy(specTexPath, this->outputPath, std::experimental::filesystem::copy_options::overwrite_existing);
 			}
 			memcpy(tempMaterial.specularTexPath, specTexPath.filename().string().c_str(), PATH_SIZE);
 			std::cout << specTexPath.filename() << std::endl; // Debug
