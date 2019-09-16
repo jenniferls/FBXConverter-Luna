@@ -35,6 +35,7 @@ namespace Luna {
 		Scene scene;
 		Skeleton skeleton;
 		Animation animation;
+		Camera camera;
 		std::vector<Mesh> meshes;
 		std::vector<Material> materials;
 		std::vector<BoundingBox> boundingBoxes;

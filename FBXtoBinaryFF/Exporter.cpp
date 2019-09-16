@@ -40,6 +40,10 @@ void Exporter::WriteToBinary(const char* filename){
 	//std::cout << "Amount of meshes: " << this->writer.scene.meshCount << std::endl; //Debug
 	//std::cout << "Amount of materials: " << this->writer.scene.materialCount << std::endl; //Debug
 
+	if (writer.scene.hasCamera == true) {
+		writer.write(outfile, this->writer.camera);
+	}
+
 	for (unsigned int i = 0; i < this->writer.scene.meshCount; i++) {
 		writer.write(outfile, this->writer.meshes[i]);
 		//std::cout << std::endl << "Mesh " << i << std::endl; //Debug
