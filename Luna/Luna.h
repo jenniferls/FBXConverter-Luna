@@ -98,8 +98,9 @@ namespace Luna {
 	};
 
 	struct BoundingBox {
-		float pos[3] = { 0.0f };
-		float halfSize[3] = { 0.0f };
+		float max[3] = { 0.0f };
+		float min[3] = { 0.0f };
+		float center[3] = { 0.0f };
 	};
 
 	struct Camera {
