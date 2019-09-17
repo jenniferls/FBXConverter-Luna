@@ -338,9 +338,9 @@ bool Reader::CreateBoundingBox(FbxMesh* mesh, Exporter* exporter)
 	boundingBox.max[1] = (float)maxPos[1];
 	boundingBox.max[2] = (float)maxPos[2];
 
-	boundingBox.max[0] = (float)minPos[0];
-	boundingBox.max[1] = (float)minPos[1];
-	boundingBox.max[2] = (float)minPos[2];
+	boundingBox.min[0] = (float)minPos[0];
+	boundingBox.min[1] = (float)minPos[1];
+	boundingBox.min[2] = (float)minPos[2];
 
 	boundingBox.center[0] = (float)maxPos[0] / 2 + (float)minPos[0] / 2;
 	boundingBox.center[1] = (float)maxPos[1] / 2 + (float)minPos[1] / 2;
