@@ -38,6 +38,7 @@ private:
 	void GetMeshData(FbxMesh* mesh, Exporter* exporter);
 	void GetMaterialData(FbxMesh* mesh, Exporter* exporter);
 	bool GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter);
+	bool CreateBoundingBox(FbxMesh* mesh, Exporter* exporter);
 	void GetWeightsData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter);
 	void GetAnimationData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter);
 

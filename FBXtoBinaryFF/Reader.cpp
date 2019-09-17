@@ -253,75 +253,82 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 }
 
 bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
+
 	for (int i = 0; i < mesh->GetNode()->GetChildCount(); i++) {
 		FbxNode* child = mesh->GetNode()->GetChild(i);
 		if (isBoundingBox(child)) {
-			//std::cout << "A bounding box was found!" << std::endl; //Debug
-
-			Luna::BoundingBox tempBBox;
-
-			tempBBox.pos[0] = (float)child->LclTranslation.Get()[0]; //Offsets in case the mesh is not created at origo
-			tempBBox.pos[1] = (float)child->LclTranslation.Get()[1];
-			tempBBox.pos[2] = (float)child->LclTranslation.Get()[2];
-
-			FbxMesh* bBoxMesh = child->GetMesh();
-
-			unsigned int vertCount = bBoxMesh->GetControlPointsCount();
-			
-			int minX = 0;
-			int minY = 0;
-			int minZ = 0;
-			int maxX = 0;
-			int maxY = 0;
-			int maxZ = 0;
-
-			for (unsigned int j = 1; j < vertCount; j++) {
-				FbxVector4 point = bBoxMesh->GetControlPointAt(j);
-				if (point[0] < bBoxMesh->GetControlPointAt(minX)[0])
-				{
-					minX = j;
-				}
-				if (point[1] < bBoxMesh->GetControlPointAt(minY)[1])
-				{
-					minY = j;
-				}
-				if (point[2] < bBoxMesh->GetControlPointAt(minZ)[2])
-				{
-					minZ = j;
-				}
-
-				if (point[0] > bBoxMesh->GetControlPointAt(maxX)[0])
-				{
-					maxX = j;
-				}
-				if (point[1] > bBoxMesh->GetControlPointAt(maxY)[1])
-				{
-					maxY = j;
-				}
-				if (point[2] > bBoxMesh->GetControlPointAt(maxZ)[2])
-				{
-					maxZ = j;
-				}
-			}
-
-			double max[3];
-			double min[3];
-			max[0] = bBoxMesh->GetControlPointAt(maxX)[0];
-			max[1] = bBoxMesh->GetControlPointAt(maxY)[1];
-			max[2] = bBoxMesh->GetControlPointAt(maxZ)[2];
-			min[0] = bBoxMesh->GetControlPointAt(minX)[0];
-			min[1] = bBoxMesh->GetControlPointAt(minY)[1];
-			min[2] = bBoxMesh->GetControlPointAt(minZ)[2];
-
-			tempBBox.halfSize[0] = (float)max[0] / 2;
-			tempBBox.halfSize[1] = (float)max[1] / 2;
-			tempBBox.halfSize[2] = (float)max[2] / 2;
-
-			exporter->writer.boundingBoxes.push_back(tempBBox);
-			return true;
+			return CreateBoundingBox(child->GetMesh(), exporter);
 		}
 	}
-	return false;
+	return CreateBoundingBox(mesh, exporter);;
+}
+
+bool Reader::CreateBoundingBox(FbxMesh* mesh, Exporter* exporter)
+{
+	Luna::BoundingBox boundingBox;
+
+	int minX = 0;
+	int minY = 0;
+	int minZ = 0;
+	int maxX = 0;
+	int maxY = 0;
+	int maxZ = 0;
+
+	for (int i = 0; i < mesh->GetControlPointsCount(); i++)
+	{
+		FbxVector4 point = mesh->GetControlPointAt(i);
+
+		if (point[0] < mesh->GetControlPointAt(minX)[0])
+		{
+			minX = i;
+		}
+		if (point[1] < mesh->GetControlPointAt(minY)[1])
+		{
+			minY = i;
+		}
+		if (point[2] < mesh->GetControlPointAt(minZ)[2])
+		{
+			minZ = i;
+		}
+		if (point[0] > mesh->GetControlPointAt(maxX)[0])
+		{
+			maxX = i;
+		}
+		if (point[1] > mesh->GetControlPointAt(maxY)[1])
+		{
+			maxY = i;
+		}
+		if (point[2] > mesh->GetControlPointAt(maxZ)[2])
+		{
+			maxZ = i;
+		}
+	}
+
+	double maxPos[3];
+	double minPos[3];
+
+	maxPos[0] = mesh->GetControlPointAt(maxX)[0];
+	maxPos[1] = mesh->GetControlPointAt(maxY)[1];
+	maxPos[2] = mesh->GetControlPointAt(maxZ)[2];
+	minPos[0] = mesh->GetControlPointAt(minX)[0];
+	minPos[1] = mesh->GetControlPointAt(minY)[1];
+	minPos[2] = mesh->GetControlPointAt(minZ)[2];
+
+	boundingBox.max[0] = (float)maxPos[0];
+	boundingBox.max[1] = (float)maxPos[1];
+	boundingBox.max[2] = (float)maxPos[2];
+
+	boundingBox.max[0] = (float)minPos[0];
+	boundingBox.max[1] = (float)minPos[1];
+	boundingBox.max[2] = (float)minPos[2];
+
+	boundingBox.center[0] = (float)maxPos[0] / 2 + (float)minPos[0] / 2;
+	boundingBox.center[1] = (float)maxPos[1] / 2 + (float)minPos[1] / 2;
+	boundingBox.center[2] = (float)maxPos[2] / 2 + (float)minPos[2] / 2;
+
+	exporter->writer.boundingBoxes.push_back(boundingBox);
+
+	return true;
 }
 
 void Reader::GetWeightsData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter) {

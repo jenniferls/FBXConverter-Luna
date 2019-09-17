@@ -46,8 +46,9 @@ void Loader::PrintData(const char* filePath) {
 		if (mesh.hasBoundingBox) {
 			Luna::BoundingBox bbox = reader.getBoundingBox(mesh.id);
 			std::cout << std::endl << "--- Bounding Box ---" << std::endl;
-			std::cout << "Half size: " << bbox.halfSize[0] << ", " << bbox.halfSize[1] << ", " << bbox.halfSize[2] << std::endl;
-			std::cout << "Position (offset): " << bbox.pos[0] << ", " << bbox.pos[1] << ", " << bbox.pos[2] << std::endl;
+			std::cout << "Center position: " << bbox.center[0] << ", " << bbox.center[1] << ", " << bbox.center[2] << std::endl;
+			std::cout << "Max position: " << bbox.max[0] << ", " << bbox.max[1] << ", " << bbox.max[2] << std::endl;
+			std::cout << "Min position: " << bbox.min[0] << ", " << bbox.min[1] << ", " << bbox.min[2] << std::endl;
 		}
 
 		if (mesh.hasSkeleton) {
