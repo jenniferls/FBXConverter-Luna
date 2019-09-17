@@ -17,7 +17,7 @@ namespace Luna {
 		Mesh getMesh(int id) const;
 		Skeleton getSkeleton() const;
 		Animation getAnimation() const;
-		//Camera getCamera() const;
+		Camera getCamera() const;
 
 		Material getMaterial(int meshID) const;
 		BoundingBox getBoundingBox(int meshID) const;
@@ -43,14 +43,14 @@ namespace Luna {
 		void read(std::ifstream& infile, Animation& anim);
 		void read(std::ifstream& infile, Keyframe& frame);
 		void read(std::ifstream& infile, BoundingBox& boundingBox);
-		//void read(std::ifstream& infile, Camera& camera);
+		void read(std::ifstream& infile, Camera& camera);
 
 		void clean();
 
 		Scene scene;
 		Skeleton skeleton;
 		Animation animation;
-		//Camera camera;
+		Camera camera;
 		std::vector<Mesh> meshes;
 		std::vector<Joint> joints;
 		std::vector<Material> materials;
