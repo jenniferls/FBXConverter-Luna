@@ -4,9 +4,8 @@ A small tool for converting FBX files into a custom binary file format called Lu
 
 ### To do:
 
-- [ ] Support for Cameras
-- [ ] Support for Specular map
-- [ ] Animated object transform
-- [ ] Automatic triangulation
+- [x] Support for Cameras
+- [x] Support for Specular map
+- [x] Automatic triangulation
 - [ ] Back up bounding box
-- [ ] Automatic folder creation
+- [x] Automatic folder creation
