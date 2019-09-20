@@ -91,6 +91,9 @@ void Reader::GetData(FbxNode* node, Exporter* exporter) {
 
 void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 	//std::cout << "This is a mesh!" << std::endl; //Debug
+	if (!isTriangulated(mesh)) {
+		throw("Error: The mesh is not triangulated!");
+	}
 	Luna::Mesh tempMesh; //Create temporary mesh and fill with info
 
 	memcpy(tempMesh.name, mesh->GetNode()->GetName(), NAME_SIZE);
@@ -125,49 +128,42 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 	//std::vector<Luna::Index> tempIndices;
 
 	Luna::Vertex tempVertex; //Temporary vertex
-	if (!isTriangulated(mesh)) {
-		triangulating(mesh, exporter, &tempVertices);
-		//throw("Error: The mesh is not triangulated!");
-	}
-	else
-	{
-		for (int i = 0; i < vertIndexCount; i++) { //For every vertex
-			unsigned int currentVertIndex = vertIndices[i];
+	for (int i = 0; i < vertIndexCount; i++) { //For every vertex
+		unsigned int currentVertIndex = vertIndices[i];
 
-			FbxVector4 fbxPos = mesh->GetControlPointAt(currentVertIndex);
-			exporter->writer.setVertexPosition(tempVertex, (float)fbxPos[0], (float)fbxPos[1], (float)fbxPos[2]);
+		FbxVector4 fbxPos = mesh->GetControlPointAt(currentVertIndex);
+		exporter->writer.setVertexPosition(tempVertex, (float)fbxPos[0], (float)fbxPos[1], (float)fbxPos[2]);
 
-			exporter->writer.setVertexNormal(tempVertex, (float)fbxNormals.GetAt(i)[0], (float)fbxNormals.GetAt(i)[1], (float)fbxNormals.GetAt(i)[2]);
+		exporter->writer.setVertexNormal(tempVertex, (float)fbxNormals.GetAt(i)[0], (float)fbxNormals.GetAt(i)[1], (float)fbxNormals.GetAt(i)[2]);
 
-			FbxVector2 fbxUV = mesh->GetElementUV()->GetDirectArray().GetAt(fbxUVIndices.at(i));
-			exporter->writer.setVertexUV(tempVertex, (float)fbxUV[0], (float)fbxUV[1]);
+		FbxVector2 fbxUV = mesh->GetElementUV()->GetDirectArray().GetAt(fbxUVIndices.at(i));
+		exporter->writer.setVertexUV(tempVertex, (float)fbxUV[0], (float)fbxUV[1]);
 
-			FbxVector4 fbxTangent = mesh->GetElementTangent()->GetDirectArray().GetAt(i);
-			exporter->writer.setVertexTangent(tempVertex, (float)fbxTangent[0], (float)fbxTangent[1], (float)fbxTangent[2]);
+		FbxVector4 fbxTangent = mesh->GetElementTangent()->GetDirectArray().GetAt(i);
+		exporter->writer.setVertexTangent(tempVertex, (float)fbxTangent[0], (float)fbxTangent[1], (float)fbxTangent[2]);
 
-			FbxVector4 fbxBinormal = mesh->GetElementBinormal()->GetDirectArray().GetAt(i);
-			exporter->writer.setVertexBiTangent(tempVertex, (float)fbxBinormal[0], (float)fbxBinormal[1], (float)fbxBinormal[2]);
+		FbxVector4 fbxBinormal = mesh->GetElementBinormal()->GetDirectArray().GetAt(i);
+		exporter->writer.setVertexBiTangent(tempVertex, (float)fbxBinormal[0], (float)fbxBinormal[1], (float)fbxBinormal[2]);
 
-			//bool isDuplicate = false;
-			//for (int j = 0; j < tempVertices.size() && !isDuplicate; j++) { //Test for duplicate vertices, this is done as a means of optimization used together with indexed rendering
-			//	if (tempVertices.at(j) == tempVertex) { //If the contents of both vertices are the same
-			//		isDuplicate = true;
+		//bool isDuplicate = false;
+		//for (int j = 0; j < tempVertices.size() && !isDuplicate; j++) { //Test for duplicate vertices, this is done as a means of optimization used together with indexed rendering
+		//	if (tempVertices.at(j) == tempVertex) { //If the contents of both vertices are the same
+		//		isDuplicate = true;
 
-			//		Luna::Index tempIndex;
-			//		tempIndex.vertIndex = j;
-			//		tempIndices.push_back(tempIndex);
-			//	}
-			//}
-			//if (!isDuplicate) {
-			//	tempVertices.push_back(tempVertex);
+		//		Luna::Index tempIndex;
+		//		tempIndex.vertIndex = j;
+		//		tempIndices.push_back(tempIndex);
+		//	}
+		//}
+		//if (!isDuplicate) {
+		//	tempVertices.push_back(tempVertex);
 
-			//	Luna::Index tempIndex;
-			//	tempIndex.vertIndex = (unsigned int)tempVertices.size(); //Current size of array
-			//	tempIndices.push_back(tempIndex);
-			//}
+		//	Luna::Index tempIndex;
+		//	tempIndex.vertIndex = (unsigned int)tempVertices.size(); //Current size of array
+		//	tempIndices.push_back(tempIndex);
+		//}
 
-			tempVertices.push_back(tempVertex);
-		}
+		tempVertices.push_back(tempVertex);
 	}
 
 	tempMesh.vertexCount = (unsigned int)tempVertices.size(); //Set the new vertex count
@@ -224,8 +220,6 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 
 		FbxProperty diffuseProp = material->FindProperty(FbxSurfaceMaterial::sDiffuse);
 		unsigned int diffuseMapCount = diffuseProp.GetSrcObjectCount<FbxFileTexture>();
-		FbxProperty specularProp = material->FindProperty(FbxSurfaceMaterial::sSpecular);
-		unsigned int specularMapCount = specularProp.GetSrcObjectCount<FbxFileTexture>();
 		FbxProperty normalProp = material->FindProperty(FbxSurfaceMaterial::sNormalMap);
 		unsigned int normalMapCount = normalProp.GetSrcObjectCount<FbxFileTexture>();
 		FbxProperty glowProp = material->FindProperty(FbxSurfaceMaterial::sEmissive);
@@ -235,30 +229,20 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 			const FbxFileTexture* diffTexture = FbxCast<FbxFileTexture>(diffuseProp.GetSrcObject<FbxFileTexture>(0));
 			std::experimental::filesystem::path diffTexPath = diffTexture->GetFileName();
 			if (std::experimental::filesystem::exists(diffTexPath)) {
-				std::experimental::filesystem::copy(diffTexPath, this->outputPath, std::experimental::filesystem::copy_options::overwrite_existing);
+				std::experimental::filesystem::copy(diffTexPath, this->outputPath);
 			}
 			memcpy(tempMaterial.diffuseTexPath, diffTexPath.filename().string().c_str(), PATH_SIZE);
-			std::cout << diffTexPath.filename() << std::endl; //Debug
-		}
-
-		if (specularMapCount > 0) {
-			const FbxFileTexture* specTexture = FbxCast<FbxFileTexture>(specularProp.GetSrcObject<FbxFileTexture>(0));
-			std::experimental::filesystem::path specTexPath = specTexture->GetFileName();
-			if (std::experimental::filesystem::exists(specTexPath)) {
-				std::experimental::filesystem::copy(specTexPath, this->outputPath, std::experimental::filesystem::copy_options::overwrite_existing);
-			}
-			memcpy(tempMaterial.specularTexPath, specTexPath.filename().string().c_str(), PATH_SIZE);
-			std::cout << specTexPath.filename() << std::endl; // Debug
+			//std::cout << diffTexPath.filename() << std::endl; //Debug
 		}
 
 		if (normalMapCount > 0) {
 			const FbxFileTexture* normTexture = FbxCast<FbxFileTexture>(normalProp.GetSrcObject<FbxFileTexture>(0));
 			std::experimental::filesystem::path normTexPath = normTexture->GetFileName();
 			if (std::experimental::filesystem::exists(normTexPath)) {
-				std::experimental::filesystem::copy(normTexPath, this->outputPath, std::experimental::filesystem::copy_options::overwrite_existing);
+				std::experimental::filesystem::copy(normTexPath, this->outputPath);
 			}
 			memcpy(tempMaterial.normalTexPath, normTexPath.filename().string().c_str(), PATH_SIZE);
-			std::cout << normTexPath.filename() << std::endl; //Debug
+			//std::cout << normTexPath.filename() << std::endl; //Debug
 			tempMaterial.hasNormalMap = true;
 		}
 
@@ -266,7 +250,7 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 			const FbxFileTexture* glowTexture = FbxCast<FbxFileTexture>(glowProp.GetSrcObject<FbxFileTexture>(0));
 			std::experimental::filesystem::path glowTexPath = glowTexture->GetFileName();
 			if (std::experimental::filesystem::exists(glowTexPath)) {
-				std::experimental::filesystem::copy(glowTexPath, this->outputPath, std::experimental::filesystem::copy_options::overwrite_existing);
+				std::experimental::filesystem::copy(glowTexPath, this->outputPath);
 			}
 			memcpy(tempMaterial.glowTexPath, glowTexPath.filename().string().c_str(), PATH_SIZE);
 			//std::cout << glowTexPath.filename() << std::endl; //Debug
@@ -279,81 +263,28 @@ void Reader::GetMaterialData(FbxMesh* mesh, Exporter* exporter) {
 }
 
 bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
-	
-	Luna::BoundingBox tempBBox;
-
-	bool exist = false;
 
 	for (int i = 0; i < mesh->GetNode()->GetChildCount(); i++) {
 		FbxNode* child = mesh->GetNode()->GetChild(i);
 		if (isBoundingBox(child)) {
-			//std::cout << "A bounding box was found!" << std::endl; //Debug
-
-			exist = true;
-
-			tempBBox.pos[0] = (float)child->LclTranslation.Get()[0]; //Offsets in case the mesh is not created at origo
-			tempBBox.pos[1] = (float)child->LclTranslation.Get()[1];
-			tempBBox.pos[2] = (float)child->LclTranslation.Get()[2];
-
-			FbxMesh* bBoxMesh = child->GetMesh();
-
-			unsigned int vertCount = bBoxMesh->GetControlPointsCount();
-			
-			int minX = 0;
-			int minY = 0;
-			int minZ = 0;
-			int maxX = 0;
-			int maxY = 0;
-			int maxZ = 0;
-
-			for (unsigned int j = 1; j < vertCount; j++) {
-				FbxVector4 point = bBoxMesh->GetControlPointAt(j);
-				if (point[0] < bBoxMesh->GetControlPointAt(minX)[0])
-				{
-					minX = j;
-				}
-				if (point[1] < bBoxMesh->GetControlPointAt(minY)[1])
-				{
-					minY = j;
-				}
-				if (point[2] < bBoxMesh->GetControlPointAt(minZ)[2])
-				{
-					minZ = j;
-				}
-				if (point[0] > bBoxMesh->GetControlPointAt(maxX)[0])
-				{
-					maxX = j;
-				}
-				if (point[1] > bBoxMesh->GetControlPointAt(maxY)[1])
-				{
-					maxY = j;
-				}
-				if (point[2] > bBoxMesh->GetControlPointAt(maxZ)[2])
-				{
-					maxZ = j;
-				}
-			}
-
-			double max[3];
-			double min[3];
-			max[0] = bBoxMesh->GetControlPointAt(maxX)[0];
-			max[1] = bBoxMesh->GetControlPointAt(maxY)[1];
-			max[2] = bBoxMesh->GetControlPointAt(maxZ)[2];
-			min[0] = bBoxMesh->GetControlPointAt(minX)[0];
-			min[1] = bBoxMesh->GetControlPointAt(minY)[1];
-			min[2] = bBoxMesh->GetControlPointAt(minZ)[2];
-
-			tempBBox.halfSize[0] = (float)max[0] / 2;
-			tempBBox.halfSize[1] = (float)max[1] / 2;
-			tempBBox.halfSize[2] = (float)max[2] / 2;
-
-			exporter->writer.boundingBoxes.push_back(tempBBox);
-			return true;
+			return CreateBoundingBox(child->GetMesh(), exporter);
 		}
-		
 	}
+	return CreateBoundingBox(mesh, exporter);;
+}
 
-	if (!exist)
+bool Reader::CreateBoundingBox(FbxMesh* mesh, Exporter* exporter)
+{
+	Luna::BoundingBox boundingBox;
+
+	int minX = 0;
+	int minY = 0;
+	int minZ = 0;
+	int maxX = 0;
+	int maxY = 0;
+	int maxZ = 0;
+
+	for (int i = 0; i < mesh->GetControlPointsCount(); i++)
 	{
 		int minX = 0;
 		int minY = 0;
@@ -367,55 +298,57 @@ bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
 		{
 			FbxVector4 point = mesh->GetControlPointAt(i);
 
-			if (point[0] < mesh->GetControlPointAt(minX)[0])
-			{
-				minX = i;
-			}
-			if (point[1] < mesh->GetControlPointAt(minY)[1])
-			{
-				minY = i;
-			}
-			if (point[2] < mesh->GetControlPointAt(minZ)[2])
-			{
-				minZ = i;
-			}
-			if (point[0] > mesh->GetControlPointAt(maxX)[0])
-			{
-				maxX = i;
-			}
-			if (point[1] > mesh->GetControlPointAt(maxY)[1])
-			{
-				maxY = i;
-			}
-			if (point[2] > mesh->GetControlPointAt(maxZ)[2])
-			{
-				maxZ = i;
-			}
+		if (point[0] < mesh->GetControlPointAt(minX)[0])
+		{
+			minX = i;
 		}
-
-		double max[3];
-		double min[3];
-		max[0] = mesh->GetControlPointAt(maxX)[0];
-		max[1] = mesh->GetControlPointAt(maxY)[1];
-		max[2] = mesh->GetControlPointAt(maxZ)[2];
-		min[0] = mesh->GetControlPointAt(minX)[0];
-		min[1] = mesh->GetControlPointAt(minY)[1];
-		min[2] = mesh->GetControlPointAt(minZ)[2];
-
-		tempBBox.pos[0] = (float)max[0];
-		tempBBox.pos[1] = (float)max[1];
-		tempBBox.pos[2] = (float)max[2];
-
-		tempBBox.halfSize[0] = (float)max[0] / 2;
-		tempBBox.halfSize[1] = (float)max[1] / 2;
-		tempBBox.halfSize[2] = (float)max[2] / 2;
-
-		exporter->writer.boundingBoxes.push_back(tempBBox);
-
-		return true;
+		if (point[1] < mesh->GetControlPointAt(minY)[1])
+		{
+			minY = i;
+		}
+		if (point[2] < mesh->GetControlPointAt(minZ)[2])
+		{
+			minZ = i;
+		}
+		if (point[0] > mesh->GetControlPointAt(maxX)[0])
+		{
+			maxX = i;
+		}
+		if (point[1] > mesh->GetControlPointAt(maxY)[1])
+		{
+			maxY = i;
+		}
+		if (point[2] > mesh->GetControlPointAt(maxZ)[2])
+		{
+			maxZ = i;
+		}
 	}
 
-	return false;
+	double maxPos[3];
+	double minPos[3];
+
+	maxPos[0] = mesh->GetControlPointAt(maxX)[0];
+	maxPos[1] = mesh->GetControlPointAt(maxY)[1];
+	maxPos[2] = mesh->GetControlPointAt(maxZ)[2];
+	minPos[0] = mesh->GetControlPointAt(minX)[0];
+	minPos[1] = mesh->GetControlPointAt(minY)[1];
+	minPos[2] = mesh->GetControlPointAt(minZ)[2];
+
+	boundingBox.max[0] = (float)maxPos[0];
+	boundingBox.max[1] = (float)maxPos[1];
+	boundingBox.max[2] = (float)maxPos[2];
+
+	boundingBox.max[0] = (float)minPos[0];
+	boundingBox.max[1] = (float)minPos[1];
+	boundingBox.max[2] = (float)minPos[2];
+
+	boundingBox.center[0] = (float)maxPos[0] / 2 + (float)minPos[0] / 2;
+	boundingBox.center[1] = (float)maxPos[1] / 2 + (float)minPos[1] / 2;
+	boundingBox.center[2] = (float)maxPos[2] / 2 + (float)minPos[2] / 2;
+
+	exporter->writer.boundingBoxes.push_back(boundingBox);
+
+	return true;
 }
 
 void Reader::GetWeightsData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter) {
@@ -611,93 +544,8 @@ bool Reader::isTriangulated(FbxMesh* mesh) {
 	for (int i = 0; i < mesh->GetPolygonCount() && isTriangle == true; i++) {
 		int polySize = mesh->GetPolygonSize(i);
 		if (polySize != 3) {
-
 			isTriangle = false;
 		}
 	}
 	return isTriangle;
-}
-
-void Reader::triangulating(FbxMesh* mesh, Exporter* exporter, std::vector<Luna::Vertex> * vertices)
-{
-	int polygonCount = mesh->GetPolygonCount();
-	std::vector<Luna::Vertex> tempVertices; //Temporary vertex array 
-	Luna::Vertex vtx; //Temporary vertex
-	int nrOfVtx = 0, vtxIndex = 0;
-
-	for (int i = 0; i < polygonCount; i++)
-	{
-		int polygonSize = mesh->GetPolygonSize(i);
-		for (int j = 0; j < polygonSize; j++)
-		{
-			int controlPointIndex = mesh->GetPolygonVertex(i, j);
-			int textureUVIndex = mesh->GetTextureUVIndex(i, j);
-			if (j < 3)
-			{
-				FbxVector4 fbxPos = mesh->GetControlPointAt(controlPointIndex);
-				exporter->writer.setVertexPosition(vtx, (float)fbxPos[0], (float)fbxPos[1], (float)fbxPos[2]);
-
-				FbxVector2 fbxUV = mesh->GetElementUV()->GetDirectArray().GetAt(textureUVIndex);
-				exporter->writer.setVertexUV(vtx, (float)fbxUV[0], (float)fbxUV[1]);
-
-				FbxVector4 fbxNormal = mesh->GetElementNormal()->GetDirectArray().GetAt(vtxIndex);
-				exporter->writer.setVertexNormal(vtx, (float)fbxNormal[0], (float)fbxNormal[1], (float)fbxNormal[2]);
-
-				FbxVector4 fbxTangent = mesh->GetElementTangent()->GetDirectArray().GetAt(vtxIndex);
-				exporter->writer.setVertexTangent(vtx, (float)fbxTangent[0], (float)fbxTangent[1], (float)fbxTangent[2]);
-
-				FbxVector4 fbxBinormal = mesh->GetElementBinormal()->GetDirectArray().GetAt(vtxIndex);
-				exporter->writer.setVertexBiTangent(vtx, (float)fbxBinormal[0], (float)fbxBinormal[1], (float)fbxBinormal[2]);
-				tempVertices.push_back(vtx);
-				nrOfVtx++;
-			}
-			else
-			{
-				for (int k = 0; k < 3; k++)
-				{
-					int replaceJ, addOn;
-					switch (k)
-					{
-					case 0:
-						replaceJ = 0;
-						addOn = -j;
-						break;
-					case 1:
-						replaceJ = j-1;
-						addOn = -1;
-						break;
-					case 2:
-						replaceJ = j;
-						addOn = 0;
-						break;
-					default:
-						break;
-					}
-					controlPointIndex = mesh->GetPolygonVertex(i, replaceJ);
-					textureUVIndex = mesh->GetTextureUVIndex(i, replaceJ);
-
-					FbxVector4 fbxPos = mesh->GetControlPointAt(controlPointIndex);
-					exporter->writer.setVertexPosition(vtx, (float)fbxPos[0], (float)fbxPos[1], (float)fbxPos[2]);
-
-					FbxVector2 fbxUV = mesh->GetElementUV()->GetDirectArray().GetAt(textureUVIndex);
-					exporter->writer.setVertexUV(vtx, (float)fbxUV[0], (float)fbxUV[1]);
-
-					FbxVector4 fbxNormal = mesh->GetElementNormal()->GetDirectArray().GetAt(vtxIndex + addOn);
-					exporter->writer.setVertexNormal(vtx, (float)fbxNormal[0], (float)fbxNormal[1], (float)fbxNormal[2]);
-
-					FbxVector4 fbxTangent = mesh->GetElementTangent()->GetDirectArray().GetAt(vtxIndex + addOn);
-					exporter->writer.setVertexTangent(vtx, (float)fbxTangent[0], (float)fbxTangent[1], (float)fbxTangent[2]);
-
-					FbxVector4 fbxBinormal = mesh->GetElementBinormal()->GetDirectArray().GetAt(vtxIndex + addOn);
-					exporter->writer.setVertexBiTangent(vtx, (float)fbxBinormal[0], (float)fbxBinormal[1], (float)fbxBinormal[2]);
-					tempVertices.push_back(vtx);
-					nrOfVtx++;
-				}
-				vtxIndex++;
-			}
-		}
-
-	}
-	//
-	*vertices = tempVertices;
 }
