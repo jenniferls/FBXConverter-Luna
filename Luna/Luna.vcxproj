@@ -134,12 +134,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Luna.h" />
-    <ClInclude Include="Reader.h" />
-    <ClInclude Include="Writer.h" />
+    <ClInclude Include="LunaReader.h" />
+    <ClInclude Include="LunaWriter.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Reader.cpp" />
-    <ClCompile Include="Writer.cpp" />
+    <ClCompile Include="LunaReader.cpp" />
+    <ClCompile Include="LunaWriter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

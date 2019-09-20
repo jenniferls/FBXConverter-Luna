@@ -2,10 +2,10 @@
 #include <string>
 #include <filesystem>
 
-#include "Reader.h"
-#include "Exporter.h"
-#include "Loader.h"
-#include "Luna/Luna.h"
+#include "FBXReader.h"
+#include "FBXExporter.h"
+#include "FBXLoader.h"
+#include "../Luna/Luna.h"
 
 #include <crtdbg.h>
 #define _CRTDBG_MAP_ALLOC
@@ -32,7 +32,7 @@ int main() {
 		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	#endif
 
-	Reader reader;
+	FBXReader reader;
 	bool exit = false;
 	Commands cmd = NONE;
 
@@ -59,7 +59,7 @@ int main() {
 				std::experimental::filesystem::create_directory(mappName);
 				outputPath = mappName + "/" + outputPath.filename().string();
 
-				Reader* reader = new Reader();
+				FBXReader* reader = new FBXReader();
 				try {
 					reader->LoadFBX(inputFile.c_str());
 				}
@@ -68,7 +68,7 @@ int main() {
 					delete reader;
 					break;
 				}
-				Exporter* exporter = new Exporter();
+				FBXExporter* exporter = new FBXExporter();
 				try {
 
 
@@ -94,7 +94,7 @@ int main() {
 				std::cout << "Please input a source Luna-file path: ";
 				std::getline(std::cin, inputFile);
 
-				Loader* loader = new Loader;
+				FBXLoader* loader = new FBXLoader;
 				loader->PrintData(inputFile.c_str());
 
 				delete loader;

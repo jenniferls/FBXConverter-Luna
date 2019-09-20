@@ -83,7 +83,7 @@ struct FbxImportThreadArg;
 * \endcode
 *
 * \remarks According to the file suffix, a specialized reader will be created internally.
-*          Ex: for .fbx files a FBX Reader, for .3ds files, a 3ds reader, etc.
+*          Ex: for .fbx files a FBX FBXReader, for .3ds files, a 3ds reader, etc.
 *          Supported files formats: FBX 5/6/7 Binary & ASCII, Collada, DXF, OBJ, 3DS
 * \nosubgrouping
 */

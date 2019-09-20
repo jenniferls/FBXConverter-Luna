@@ -5,10 +5,10 @@
 #include <iostream>
 #include <vector>
 
-class Exporter {
+class FBXExporter {
 public:
-	Exporter();
-	~Exporter();
+	FBXExporter();
+	~FBXExporter();
 
 	Luna::Writer getWriter() const;
 

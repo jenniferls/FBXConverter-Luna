@@ -134,15 +134,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Exporter.cpp" />
-    <ClCompile Include="Loader.cpp" />
+    <ClCompile Include="FBXExporter.cpp" />
+    <ClCompile Include="FBXLoader.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Reader.cpp" />
+    <ClCompile Include="FBXReader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Exporter.h" />
-    <ClInclude Include="Loader.h" />
-    <ClInclude Include="Reader.h" />
+    <ClInclude Include="FBXExporter.h" />
+    <ClInclude Include="FBXLoader.h" />
+    <ClInclude Include="FBXReader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

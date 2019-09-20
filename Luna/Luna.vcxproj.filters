@@ -18,18 +18,18 @@
     <ClInclude Include="Luna.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Reader.h">
+    <ClInclude Include="LunaReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Writer.h">
+    <ClInclude Include="LunaWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Reader.cpp">
+    <ClCompile Include="LunaReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Writer.cpp">
+    <ClCompile Include="LunaWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

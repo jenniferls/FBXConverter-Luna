@@ -47,7 +47,7 @@ public:
 	virtual ~FbxIOPluginRegistry();
 
 #ifndef FBXSDK_ENV_WINSTORE
-	/** Registers a Reader from a plug-in path.
+	/** Registers a FBXReader from a plug-in path.
 	  *	\param pPluginPath          The plug-in path.
 	  * \param pFirstPluginID       Contains the ID of the first plug-in found.
 	  * \param pRegisteredCount     Contains the number of registered Readers.
@@ -59,12 +59,12 @@ public:
 						bool pOverride = false);
 #endif /* !FBXSDK_ENV_WINSTORE */
 
-	/** Registers a Reader.
-	  *	\param pCreateF             The function that creates the Reader to be registered.
-	  * \param pInfoF               The function that provides information about the Reader file format, such as the file extension and description. 
+	/** Registers a FBXReader.
+	  *	\param pCreateF             The function that creates the FBXReader to be registered.
+	  * \param pInfoF               The function that provides information about the FBXReader file format, such as the file extension and description. 
 	  * \param pFirstPluginID       Contains the ID of the first plug-in found.
 	  * \param pRegisteredCount     Contains the number of registered Readers.
-	  * \param pIOSettingsFillerF   The function that fills the IO settings for the Reader. 
+	  * \param pIOSettingsFillerF   The function that fills the IO settings for the FBXReader. 
 	  * \param pOverride			Override any existing writer that is using the same extension. 
 	  */
 	void RegisterReader(FbxReader::CreateFuncType pCreateF, 
@@ -102,10 +102,10 @@ public:
 						FbxWriter::IOSettingsFillerFuncType pIOSettingsFillerF = NULL,
 						bool pOverride = false);
 
-	/** Creates a Reader.
-	*	\param pManager         The SDK Manager where the Reader is created.
-	  *	\param pImporter        The importer that holds the created Reader.
-	  * \param pPluginID        The Reader ID.
+	/** Creates a FBXReader.
+	*	\param pManager         The SDK Manager where the FBXReader is created.
+	  *	\param pImporter        The importer that holds the created FBXReader.
+	  * \param pPluginID        The FBXReader ID.
 	  */
 	FbxReader* CreateReader(FbxManager& pManager, 
 							 FbxImporter& pImporter, 
@@ -120,9 +120,9 @@ public:
 							 FbxExporter& pExporter,
 							 int pPluginID) const;
 
-	/** Searches for the Reader ID by the file extension.
+	/** Searches for the FBXReader ID by the file extension.
 	  * \param pExt             The file extension.
-	  *	\return                 The Reader ID if found, if not found, returns -1
+	  *	\return                 The FBXReader ID if found, if not found, returns -1
 	  */
 	int FindReaderIDByExtension(const char* pExt) const;
 
@@ -132,9 +132,9 @@ public:
 	  */
 	int FindWriterIDByExtension(const char* pExt) const;
 	
-	/** Searches for the Reader ID by the file format description.
+	/** Searches for the FBXReader ID by the file format description.
 	  * \param pDesc            The file format description.	  
-	  *	\return                 The Reader ID if found, if not found, returns -1
+	  *	\return                 The FBXReader ID if found, if not found, returns -1
 	  */
 	int FindReaderIDByDescription(const char* pDesc) const;
 
@@ -144,9 +144,9 @@ public:
 	  */
 	int FindWriterIDByDescription(const char* pDesc) const;
 	
-	/** Verifies if the file format of the Reader is FBX.
+	/** Verifies if the file format of the FBXReader is FBX.
 	  * \param pFileFormat      The file format identifier.
-	  *	\return                 \c True if the file format of the Reader is FBX, return \c false otherwise..
+	  *	\return                 \c True if the file format of the FBXReader is FBX, return \c false otherwise..
 	  */
 	bool ReaderIsFBX(int pFileFormat) const;
 
@@ -156,9 +156,9 @@ public:
 	  */
 	bool WriterIsFBX(int pFileFormat) const;
 
-	/** Verifies if the file format of the Reader is genuine (internal).
+	/** Verifies if the file format of the FBXReader is genuine (internal).
       * \param pFileFormat      The file format identifier.
-	  *	\return                 \c True if the file format of the Reader is FBX, DXF, 3DS, OBJ and DAE, return \c false otherwise.
+	  *	\return                 \c True if the file format of the FBXReader is FBX, DXF, 3DS, OBJ and DAE, return \c false otherwise.
 	  */
 	bool ReaderIsGenuine(int pFileFormat) const;
 
@@ -235,8 +235,8 @@ public:
 	  */
 	bool DetectWriterFileFormat(const char* pFileName, int& pFileFormat) const;
 	
-	/** Returns the file format of the native Reader.
-	  *	\return     The ID of the native Reader's file format.
+	/** Returns the file format of the native FBXReader.
+	  *	\return     The ID of the native FBXReader's file format.
 	  */
 	int GetNativeReaderFormat();
 

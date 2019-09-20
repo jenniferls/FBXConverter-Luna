@@ -72,12 +72,22 @@ void Reader::GetData(FbxNode* node, Exporter* exporter) {
 		GetData(node->GetChild(i), exporter); //Recursive
 	}
 
+	FbxCamera* camera = node->GetCamera();
 	FbxMesh* mesh = node->GetMesh();
+
+
+	//node->LclTranslation.Get();
+	//node->LclRotation.Get();
+	//node->
+
+
 
 	if (mesh && !isBoundingBox(node)) { //If the node is a mesh that is not a bounding box
 		GetMeshData(mesh, exporter);
 	}
 }
+
+//GetSkeleton()?
 
 void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 	//std::cout << "This is a mesh!" << std::endl; //Debug
@@ -276,7 +286,17 @@ bool Reader::CreateBoundingBox(FbxMesh* mesh, Exporter* exporter)
 
 	for (int i = 0; i < mesh->GetControlPointsCount(); i++)
 	{
-		FbxVector4 point = mesh->GetControlPointAt(i);
+		int minX = 0;
+		int minY = 0;
+		int minZ = 0;
+		int maxX = 0;
+		int maxY = 0;
+		int maxZ = 0;
+
+
+		for (int i = 0; i < mesh->GetControlPointsCount(); i++)
+		{
+			FbxVector4 point = mesh->GetControlPointAt(i);
 
 		if (point[0] < mesh->GetControlPointAt(minX)[0])
 		{
