@@ -12,8 +12,8 @@ Loader::~Loader() {
 void Loader::PrintData(const char* filePath) {
 	reader.readFile(filePath);
 
-	std::cout << "Scene has camera: " << (scene.hasCamera ? "Yes" : "No") << std::endl;
-	if (scene.hasCamera) {
+	std::cout << "Scene has camera: " << (reader.getHasCamera() ? "Yes" : "No") << std::endl;
+	if (reader.getHasCamera()) {
 		Luna::Camera cam = reader.getCamera();
 
 		std::cout << "--- Camera ---" << std::endl;

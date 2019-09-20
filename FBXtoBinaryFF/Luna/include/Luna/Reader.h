@@ -13,6 +13,7 @@ namespace Luna {
 
 		unsigned int getMeshCount() const;
 		unsigned int getMaterialCount() const;
+		bool getHasCamera() const;
 
 		Mesh getMesh(int id) const;
 		Skeleton getSkeleton() const;

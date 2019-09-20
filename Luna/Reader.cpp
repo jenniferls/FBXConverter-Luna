@@ -146,6 +146,10 @@ namespace Luna {
 		return this->materialCount;
 	}
 
+	bool Reader::getHasCamera() const {
+		return this->scene.hasCamera;
+	}
+
 	Mesh Reader::getMesh(int id) const {
 		return this->meshes[id];
 	}
