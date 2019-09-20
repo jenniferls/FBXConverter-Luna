@@ -108,7 +108,7 @@ namespace Luna {
 		float upVector[3] = { 0.0f };
 		float direction[3] = { 0.0f };
 		float FoV = 0.0f;
-		float near = 0.0f;
-		float far = 0.0f;
+		float camNear = 0.0f;
+		float camFar = 0.0f;
 	};
 }
