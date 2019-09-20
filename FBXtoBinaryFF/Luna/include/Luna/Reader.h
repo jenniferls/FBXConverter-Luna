@@ -2,6 +2,7 @@
 #include "Luna.h"
 #include <fstream>
 #include <vector>
+#include <Windows.h>
 
 namespace Luna {
 	class Reader {
@@ -9,7 +10,7 @@ namespace Luna {
 		Reader();
 		~Reader();
 
-		void readFile(const char* filePath); //Entry point
+		bool readFile(const char* filePath); //Entry point
 
 		unsigned int getMeshCount() const;
 		unsigned int getMaterialCount() const;

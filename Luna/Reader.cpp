@@ -9,57 +9,77 @@ namespace Luna {
 		clean();
 	}
 
-	void Reader::readFile(const char* filePath){
-		std::ifstream infile(filePath, std::ifstream::binary);
-		//TODO: Clean the reader
+	bool Reader::readFile(const char* filePath){
+		bool success = false;
+		try{
 
-		read(infile, this->scene); //Read the scene header
-		this->meshCount = this->scene.meshCount;
-		this->materialCount = this->scene.materialCount;
-		if (this->scene.hasCamera == true) {
-			read(infile, this->camera);
-		}
-		this->meshes.resize(this->scene.meshCount);
-		for (unsigned int i = 0; i < this->scene.meshCount; i++) { //For every mesh in the scene, read in mesh header
-			read(infile, this->meshes[i]);
-			this->meshVertices.push_back(new Vertex[this->meshes[i].vertexCount]);
-			this->meshIndices.push_back(new Index[this->meshes[i].indexCount]);
-			for (unsigned int j = 0; j < this->meshes[i].vertexCount; j++) { //For every vertex in the mesh, read in vertex header
-				read(infile, this->meshVertices[i][j]); //One Mesh
-			}
-			for (unsigned int j = 0; j < this->meshes[i].indexCount; j++) { //For every index in the mesh, read in index header
-				read(infile, this->meshIndices[i][j]); //One Index
-			}
-			if (this->meshes[i].hasBoundingBox) { //If the mesh has a bounding box, read in its' bounding box
-				this->boundingBoxes.push_back(BoundingBox());
-				read(infile, this->boundingBoxes[i]); //One bounding box
-			}
-			if (this->meshes[i].hasSkeleton) {
-				this->hasAnimation = true;
-				this->weights.push_back(new Weights[this->meshes[i].vertexCount]);
-				for (unsigned int j = 0; j < this->meshes[i].vertexCount; j++) {
-					read(infile, this->weights[i][j]);
-				}
-			}
-		}
-		this->materials.resize(this->materialCount);
-		for (unsigned int i = 0; i < this->materialCount; i++) {
-			read(infile, this->materials[i]);
-		}
-		if (hasAnimation) {
-			read(infile, this->animation);
-			read(infile, this->skeleton);
-			this->joints.resize(this->skeleton.jointCount);
-			for (unsigned int i = 0; i < this->skeleton.jointCount; i++) {
-				read(infile, this->joints[i]);
-				this->keyframes.push_back(new Keyframe[this->animation.keyframeCount]);
-				for (unsigned int j = 0; j < this->animation.keyframeCount; j++) {
-					read(infile, this->keyframes[i][j]);
-				}
-			}
-		}
+			std::ifstream infile(filePath, std::ifstream::binary);
 
-		infile.close();
+			std::string str(filePath);
+
+			std::string extention = ".lu";
+
+			std::string end = str.substr(str.size() - 3, str.size());
+
+			if (infile && (end == extention)){
+				//TODO: Clean the reader
+
+				read(infile, this->scene); //Read the scene header
+				this->meshCount = this->scene.meshCount;
+				this->materialCount = this->scene.materialCount;
+				if (this->scene.hasCamera == true) {
+					read(infile, this->camera);
+				}
+				this->meshes.resize(this->scene.meshCount);
+				for (unsigned int i = 0; i < this->scene.meshCount; i++) { //For every mesh in the scene, read in mesh header
+					read(infile, this->meshes[i]);
+					this->meshVertices.push_back(new Vertex[this->meshes[i].vertexCount]);
+					this->meshIndices.push_back(new Index[this->meshes[i].indexCount]);
+					for (unsigned int j = 0; j < this->meshes[i].vertexCount; j++) { //For every vertex in the mesh, read in vertex header
+						read(infile, this->meshVertices[i][j]); //One Mesh
+					}
+					for (unsigned int j = 0; j < this->meshes[i].indexCount; j++) { //For every index in the mesh, read in index header
+						read(infile, this->meshIndices[i][j]); //One Index
+					}
+					if (this->meshes[i].hasBoundingBox) { //If the mesh has a bounding box, read in its' bounding box
+						this->boundingBoxes.push_back(BoundingBox());
+						read(infile, this->boundingBoxes[i]); //One bounding box
+					}
+					if (this->meshes[i].hasSkeleton) {
+						this->hasAnimation = true;
+						this->weights.push_back(new Weights[this->meshes[i].vertexCount]);
+						for (unsigned int j = 0; j < this->meshes[i].vertexCount; j++) {
+							read(infile, this->weights[i][j]);
+						}
+					}
+				}
+				this->materials.resize(this->materialCount);
+				for (unsigned int i = 0; i < this->materialCount; i++) {
+					read(infile, this->materials[i]);
+				}
+				if (hasAnimation) {
+					read(infile, this->animation);
+					read(infile, this->skeleton);
+					this->joints.resize(this->skeleton.jointCount);
+					for (unsigned int i = 0; i < this->skeleton.jointCount; i++) {
+						read(infile, this->joints[i]);
+						this->keyframes.push_back(new Keyframe[this->animation.keyframeCount]);
+						for (unsigned int j = 0; j < this->animation.keyframeCount; j++) {
+							read(infile, this->keyframes[i][j]);
+						}
+					}
+				}
+				success = true;
+			}
+			else{
+				OutputDebugStringW(L"The Filepath fed to the reader could not be opened. Either wrong filetype or faulty path. Please ensure file is of .lu type.");
+			}
+			infile.close();
+		}
+		catch (int n){
+			throw;
+		}
+		return success;
 	}
 
 	void Reader::read(std::ifstream& infile, Scene& scene){
