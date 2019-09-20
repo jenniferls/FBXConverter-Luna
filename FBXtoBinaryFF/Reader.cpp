@@ -71,6 +71,13 @@ void Reader::GetData(FbxNode* node, Exporter* exporter) {
 	for (int i = 0; i < node->GetChildCount(); i++) {
 		GetData(node->GetChild(i), exporter); //Recursive
 	}
+	FbxCamera* camera = node->GetCamera();
+	if (camera)
+	{
+		GetCameraData(node, exporter);
+		exporter->writer.scene.hasCamera = true;
+	}
+
 
 	FbxMesh* mesh = node->GetMesh();
 
@@ -567,6 +574,28 @@ void Reader::GetAnimationData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* e
 			}
 		}
 	}
+}
+
+void Reader::GetCameraData(FbxNode* node, Exporter* exporter)
+{
+	memcpy(exporter->writer.camera.cameraName, node->GetName(), NAME_SIZE);
+	FbxCamera* camera = (FbxCamera*)node->GetNodeAttribute();
+
+	exporter->writer.camera.camPos[0] = camera->Position.Get()[0];
+	exporter->writer.camera.camPos[1] = camera->Position.Get()[1];
+	exporter->writer.camera.camPos[2] = camera->Position.Get()[2];
+
+	exporter->writer.camera.upVector[0] = camera->UpVector.Get()[0];
+	exporter->writer.camera.upVector[1] = camera->UpVector.Get()[1];
+	exporter->writer.camera.upVector[2] = camera->UpVector.Get()[2];
+
+	exporter->writer.camera.direction[0] = camera->InterestPosition.Get()[0];
+	exporter->writer.camera.direction[1] = camera->InterestPosition.Get()[1];
+	exporter->writer.camera.direction[2] = camera->InterestPosition.Get()[2];
+
+	exporter->writer.camera.FoV = camera->FieldOfView.Get();
+	exporter->writer.camera.camNear = camera->NearPlane.Get();
+	exporter->writer.camera.camFar = camera->FarPlane.Get();
 }
 
 unsigned int Reader::GetJointIdByName(const char* jointName, Exporter* exporter, unsigned int meshID) {

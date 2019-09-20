@@ -41,6 +41,7 @@ private:
 	bool GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter);
 	void GetWeightsData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter);
 	void GetAnimationData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter);
+	void GetCameraData(FbxNode* node, Exporter* exporter);
 
 	void Triangulate(FbxMesh* mesh, Exporter* exporter, std::vector<Luna::Vertex>* vertices);
 
