@@ -528,8 +528,8 @@ void Reader::GetCameraData(FbxNode* node, Exporter* exporter)
 	exporter->writer.camera.direction[2] = camera->InterestPosition.Get()[2];
 
 	exporter->writer.camera.FoV = camera->FieldOfView.Get();
-	exporter->writer.camera.near = camera->NearPlane.Get();
-	exporter->writer.camera.far = camera->FarPlane.Get();
+	exporter->writer.camera.camNear = camera->NearPlane.Get();
+	exporter->writer.camera.camFar = camera->FarPlane.Get();
 }
 
 unsigned int Reader::GetJointIdByName(const char* jointName, Exporter* exporter, unsigned int meshID) {
