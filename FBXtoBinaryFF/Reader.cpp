@@ -292,9 +292,6 @@ bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
 
 			exist = true;
 
-			tempBBox.pos[0] = (float)child->LclTranslation.Get()[0]; //Offsets in case the mesh is not created at origo
-			tempBBox.pos[1] = (float)child->LclTranslation.Get()[1];
-			tempBBox.pos[2] = (float)child->LclTranslation.Get()[2];
 
 			FbxMesh* bBoxMesh = child->GetMesh();
 
@@ -344,9 +341,19 @@ bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
 			min[1] = bBoxMesh->GetControlPointAt(minY)[1];
 			min[2] = bBoxMesh->GetControlPointAt(minZ)[2];
 
-			tempBBox.halfSize[0] = (float)max[0] / 2;
-			tempBBox.halfSize[1] = (float)max[1] / 2;
-			tempBBox.halfSize[2] = (float)max[2] / 2;
+			double extraOffset[3];
+
+			tempBBox.halfSize[0] = ((float)max[0] - (float)min[0])/ 2;
+			tempBBox.halfSize[1] = ((float)max[1] - (float)min[1])/ 2;
+			tempBBox.halfSize[2] = ((float)max[2] - (float)min[2])/ 2;
+
+			extraOffset[0] = ((float)max[0] - tempBBox.halfSize[0]);
+			extraOffset[1] = ((float)max[1] - tempBBox.halfSize[1]);
+			extraOffset[2] = ((float)max[2] - tempBBox.halfSize[2]);
+
+			tempBBox.pos[0] = (float)child->LclTranslation.Get()[0] + extraOffset[0]; //Offsets in case the mesh is not created at origo
+			tempBBox.pos[1] = (float)child->LclTranslation.Get()[1] + extraOffset[1];
+			tempBBox.pos[2] = (float)child->LclTranslation.Get()[2] + extraOffset[2];
 
 			exporter->writer.boundingBoxes.push_back(tempBBox);
 			return true;
@@ -406,9 +413,9 @@ bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
 		tempBBox.pos[1] = (float)max[1];
 		tempBBox.pos[2] = (float)max[2];
 
-		tempBBox.halfSize[0] = (float)max[0] / 2;
-		tempBBox.halfSize[1] = (float)max[1] / 2;
-		tempBBox.halfSize[2] = (float)max[2] / 2;
+		tempBBox.halfSize[0] = ((float)max[0] - (float)min[0]);
+		tempBBox.halfSize[1] = ((float)max[1] - (float)min[1]);
+		tempBBox.halfSize[2] = ((float)max[2] - (float)min[2]);
 
 		exporter->writer.boundingBoxes.push_back(tempBBox);
 
