@@ -671,6 +671,7 @@ void Reader::Triangulate(FbxMesh* mesh, Exporter* exporter, std::vector<Luna::Ve
 				FbxVector4 fbxBinormal = mesh->GetElementBinormal()->GetDirectArray().GetAt(vtxIndex);
 				exporter->writer.setVertexBiTangent(vtx, (float)fbxBinormal[0], (float)fbxBinormal[1], (float)fbxBinormal[2]);
 				tempVertices.push_back(vtx);
+				vtxIndex++;
 				nrOfVtx++;
 			}
 			else
