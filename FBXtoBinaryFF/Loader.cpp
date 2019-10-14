@@ -32,7 +32,7 @@ void Loader::PrintData(const char* filePath) {
 
 		for (int i = 0; i < reader.getMeshCount(); i++) {
 			mesh = reader.getMesh(i);
-
+			
 			std::cout << "Mesh " << i << std::endl;
 			std::cout << "Name: " << mesh.name << std::endl;
 			std::cout << "ID: " << mesh.id << std::endl;

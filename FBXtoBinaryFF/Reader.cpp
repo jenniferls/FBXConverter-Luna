@@ -109,6 +109,7 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 	}
 
 	std::vector<Luna::Vertex> tempVertices; //Temporary vertex array (only push unique vertices to the vector)
+	std::vector<Luna::Index> tempIndices;
 
 	FbxVector4* controlPoints = mesh->GetControlPoints();
 	FbxArray<FbxVector4> fbxNormals;
@@ -127,6 +128,8 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 	//std::vector<Luna::Index> tempIndices;
 
 	Luna::Vertex tempVertex; //Temporary vertex
+	Luna::Index tempIndex; //Temporary index;
+	tempIndex.vertIndex = 0;
 	if (!isTriangulated(mesh)) {
 		Triangulate(mesh, exporter, &tempVertices);
 		//throw("Error: The mesh is not triangulated!");
@@ -149,42 +152,43 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 			FbxVector4 fbxBinormal = mesh->GetElementBinormal()->GetDirectArray().GetAt(i);
 			exporter->writer.setVertexBiTangent(tempVertex, (float)fbxBinormal[0], (float)fbxBinormal[1], (float)fbxBinormal[2]);
 
-			//bool isDuplicate = false;
-			//for (int j = 0; j < tempVertices.size() && !isDuplicate; j++) { //Test for duplicate vertices, this is done as a means of optimization used together with indexed rendering
-			//	if (tempVertices.at(j) == tempVertex) { //If the contents of both vertices are the same
-			//		isDuplicate = true;
+			bool isDuplicate = false;
+			for (int j = 0; j < tempVertices.size() && !isDuplicate; j++) { //Test for duplicate vertices, this is done as a means of optimization used together with indexed rendering
+				if (tempVertices[j] == tempVertex) { //If the contents of both vertices are the same
+					
+					isDuplicate = true;
 
-			//		Luna::Index tempIndex;
-			//		tempIndex.vertIndex = j;
-			//		tempIndices.push_back(tempIndex);
-			//	}
-			//}
-			//if (!isDuplicate) {
-			//	tempVertices.push_back(tempVertex);
+					Luna::Index alrdyExist;
+					alrdyExist.vertIndex = j;
+					tempIndices.push_back(alrdyExist);
+				}
+			}
+			if (!isDuplicate) {
+				tempVertices.push_back(tempVertex);
 
-			//	Luna::Index tempIndex;
-			//	tempIndex.vertIndex = (unsigned int)tempVertices.size(); //Current size of array
-			//	tempIndices.push_back(tempIndex);
-			//}
+				tempIndices.push_back(tempIndex);
+				tempIndex.vertIndex++; //Current size of array
+			}
 
-			tempVertices.push_back(tempVertex);
+			//tempIndex
+
 		}
 	}
 
 	tempMesh.vertexCount = (unsigned int)tempVertices.size(); //Set the new vertex count
 	exporter->meshVertices.push_back(new Luna::Vertex[tempMesh.vertexCount]); //Creates a new array of vertices for the mesh
 
-	//tempMesh.indexCount = (unsigned int)tempIndices.size(); //Set the new index count
-	//exporter->meshIndices.push_back(new Luna::Index[tempMesh.indexCount]); // Creates a new array of indices for the mesh
-
-	//for (unsigned int i = 0; i < tempMesh.indexCount; i++) { //Transfer the index information
-	//	exporter->meshIndices[tempMesh.id][i] = tempIndices[i];
-	//}
+	tempMesh.indexCount = (unsigned int)tempIndices.size(); //Set the new index count
+	exporter->meshIndices.push_back(new Luna::Index[tempMesh.indexCount]); // Creates a new array of indices for the mesh
 
 	for (unsigned int i = 0; i < tempMesh.vertexCount; i++) { //Transfer the vertex information
 		exporter->meshVertices[tempMesh.id][i] = tempVertices[i];
 	}
 
+	for (unsigned int i = 0; i < tempMesh.indexCount; i++) { //Transfer the index information
+		exporter->meshIndices[tempMesh.id][i] = tempIndices[i];
+	}
+	
 	tempMesh.hasSkeleton = hasSkeleton(mesh->GetNode());
 	if (tempMesh.hasSkeleton) {
 		//std::cout << "The mesh has a skeleton!" << std::endl; //Debug
