@@ -413,13 +413,13 @@ bool Reader::GetBoundingBoxData(FbxMesh* mesh, Exporter* exporter) {
 		min[1] = mesh->GetControlPointAt(minY)[1];
 		min[2] = mesh->GetControlPointAt(minZ)[2];
 
-		tempBBox.pos[0] = (float)max[0];
-		tempBBox.pos[1] = (float)max[1];
-		tempBBox.pos[2] = (float)max[2];
+		tempBBox.pos[0] = ((float)max[0] + (float)min[0]) / 2;
+		tempBBox.pos[1] = ((float)max[1] + (float)min[1]) / 2;
+		tempBBox.pos[2] = ((float)max[2] + (float)min[2]) / 2;
 
-		tempBBox.halfSize[0] = ((float)max[0] - (float)min[0]);
-		tempBBox.halfSize[1] = ((float)max[1] - (float)min[1]);
-		tempBBox.halfSize[2] = ((float)max[2] - (float)min[2]);
+		tempBBox.halfSize[0] = ((float)max[0] - (float)min[0]) / 2;
+		tempBBox.halfSize[1] = ((float)max[1] - (float)min[1]) / 2;
+		tempBBox.halfSize[2] = ((float)max[2] - (float)min[2]) / 2;
 
 		exporter->writer.boundingBoxes.push_back(tempBBox);
 
