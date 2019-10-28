@@ -474,7 +474,8 @@ void Reader::GetWeightsData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exp
 		}
 
 		int vertexId = 0;
-		for (int p = 0; p < fbxmesh->GetPolygonCount(); p++)
+		int pCount = fbxmesh->GetPolygonCount();
+		for (int p = 0; p < pCount; p++)
 		{
 			for (int v = 0; v < 3; v++)
 			{
