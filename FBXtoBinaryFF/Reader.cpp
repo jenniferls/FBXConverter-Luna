@@ -1,4 +1,5 @@
 #include "Reader.h"
+#include <unordered_set>
 
 Reader::Reader() {
 	fbxManager = nullptr;
@@ -152,28 +153,152 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 			FbxVector4 fbxBinormal = mesh->GetElementBinormal()->GetDirectArray().GetAt(i);
 			exporter->writer.setVertexBiTangent(tempVertex, (float)fbxBinormal[0], (float)fbxBinormal[1], (float)fbxBinormal[2]);
 
-			bool isDuplicate = false;
-			for (int j = 0; j < tempVertices.size() && !isDuplicate; j++) { //Test for duplicate vertices, this is done as a means of optimization used together with indexed rendering
-				if (tempVertices[j] == tempVertex) { //If the contents of both vertices are the same
-					
-					isDuplicate = true;
-
-					Luna::Index alrdyExist;
-					alrdyExist.vertIndex = j;
-					tempIndices.push_back(alrdyExist);
-				}
-			}
-			if (!isDuplicate) {
-				tempVertices.push_back(tempVertex);
-
-				tempIndices.push_back(tempIndex);
-				tempIndex.vertIndex++; //Current size of array
-			}
-
-			//tempIndex
-
+			tempVertices.push_back(tempVertex);
 		}
 	}
+
+	tempMesh.vertexCount = (unsigned int)tempVertices.size(); //Set the new vertex count
+	exporter->meshVertices.push_back(new Luna::Vertex[tempMesh.vertexCount]); //Creates a new array of vertices for the mesh
+
+	for (unsigned int i = 0; i < tempMesh.vertexCount; i++) { //Transfer the vertex information
+		exporter->meshVertices[tempMesh.id][i] = tempVertices[i];
+	}
+
+	tempMesh.hasSkeleton = hasSkeleton(mesh->GetNode());
+	if (tempMesh.hasSkeleton) {
+		//std::cout << "The mesh has a skeleton!" << std::endl; //Debug
+
+		exporter->weights.push_back(new Luna::Weights[tempMesh.vertexCount]); //Create a container for all of the mesh weights
+		GetWeightsData(mesh, tempMesh.id, exporter); //Since we know that the mesh is skinned we can get the weights
+		GetAnimationData(mesh, tempMesh.id, exporter);
+	}
+
+	for (int i = 0; i < vertIndexCount; i++)
+	{
+		//bool isDuplicate = false;
+		//for (int j = 0; j < tempVertices.size() && !isDuplicate; j++) { //Test for duplicate vertices, this is done as a means of optimization used together with indexed rendering
+		//	if (tempVertices[j] == tempVertex) { //If the contents of both vertices are the same
+
+		//		isDuplicate = true;
+
+		//		Luna::Index alrdyExist;
+		//		alrdyExist.vertIndex = j;
+		//		tempIndices.push_back(alrdyExist);
+		//	}
+		//}
+
+		//if (!isDuplicate) {
+		//	tempVertices.push_back(tempVertex);
+
+		//	tempIndices.push_back(tempIndex);
+		//	tempIndex.vertIndex++; //Current size of array
+		//}
+	}
+
+	//Find and remove duplicates. Only runs O(n) times!
+
+	//Set up an iterator to store duplicate iteration locations.
+	//std::vector<Luna::Vertex>::iterator it = tempVertices.begin();
+	//std::unordered_set<Luna::Vertex> set;
+
+	//std::cout << tempVertices.size() << std::endl;
+
+	//// Go through each element in the vector.
+	//for (auto currEl = tempVertices.begin(); currEl != tempVertices.end(); ++currEl)
+	//{
+	//	//Insert each element into the set.
+	//	//If it's the second time entered we add the element to the iterator.
+	//	if (set.insert(*currEl).second)
+	//	{
+	//		*it++ = *currEl;
+	//	}
+	//}
+
+	////TODO: Use the iterator to delete all the weights for objects to be deleted too.
+
+	//// Erase all found duplicates.
+	//tempVertices.erase(it, tempVertices.end());
+
+	//std::cout << tempVertices.size() << std::endl;
+
+	//To simply do it Again WORKS but takes AGES with high poly count as we go vertIndexCount * tempVertices.size times.
+	//With the character mesh that's ~~ 1/2 BILLION times.
+
+	//REMOVE THIS IF ABOVE IMPLEMENTED ___________________________________________
+	tempVertices.clear();
+
+	std::vector<Luna::Weights> tmpWeights;
+
+	for (int i = 0; i < vertIndexCount; i++)
+	{
+		unsigned int currentVertIndex = vertIndices[i];
+
+		FbxVector4 fbxPos = mesh->GetControlPointAt(currentVertIndex);
+		exporter->writer.setVertexPosition(tempVertex, (float)fbxPos[0], (float)fbxPos[1], (float)fbxPos[2]);
+
+		exporter->writer.setVertexNormal(tempVertex, (float)fbxNormals.GetAt(i)[0], (float)fbxNormals.GetAt(i)[1], (float)fbxNormals.GetAt(i)[2]);
+
+		FbxVector2 fbxUV = mesh->GetElementUV()->GetDirectArray().GetAt(fbxUVIndices.at(i));
+		exporter->writer.setVertexUV(tempVertex, (float)fbxUV[0], (float)fbxUV[1]);
+
+		FbxVector4 fbxTangent = mesh->GetElementTangent()->GetDirectArray().GetAt(i);
+		exporter->writer.setVertexTangent(tempVertex, (float)fbxTangent[0], (float)fbxTangent[1], (float)fbxTangent[2]);
+
+		FbxVector4 fbxBinormal = mesh->GetElementBinormal()->GetDirectArray().GetAt(i);
+		exporter->writer.setVertexBiTangent(tempVertex, (float)fbxBinormal[0], (float)fbxBinormal[1], (float)fbxBinormal[2]);
+
+		bool isDuplicate = false;
+		for (int j = 0; j < tempVertices.size() && !isDuplicate; j++) { //Test for duplicate vertices, this is done as a means of optimization used together with indexed rendering
+			if (tempVertices[j] == tempVertex) { //If the contents of both vertices are the same
+
+				isDuplicate = true;
+
+				//exporter->weights[tempMesh.id][i];
+				//exporter->weights.erase(exporter->weights.begin() + i);
+				//duplicates.push_back(i);
+
+				Luna::Index alrdyExist;
+				alrdyExist.vertIndex = j;
+				tempIndices.push_back(alrdyExist);
+			}
+		}
+
+		if (!isDuplicate) {
+			tempVertices.push_back(tempVertex);
+			//Get all weights that are NOT duplicates from the exporter.
+			if (tempMesh.hasSkeleton)
+			{
+				tmpWeights.push_back(exporter->weights.at(0)[i]);
+			}
+
+			tempIndices.push_back(tempIndex);
+			tempIndex.vertIndex++; //Current size of array
+		}
+	}
+	//REMOVE THIS IF ABOVE IMPLEMENTED ___________________________________________
+
+	int size = tmpWeights.size();
+	if (tempMesh.hasSkeleton)
+	{
+		//We have isolated important weights let's reassign them.
+		delete[] exporter->weights[tempMesh.id];
+		exporter->weights.clear();
+		Luna::Weights * arr = new Luna::Weights[tmpWeights.size()];
+
+		for (int i = 0; i < tmpWeights.size(); i++)
+		{
+			arr[i] = tmpWeights[i];
+		}
+
+		exporter->weights.push_back(arr);
+
+		/*delete[] arr;*/
+
+		tmpWeights.clear();
+	}
+
+	//Since we've removed verts.
+	exporter->meshVertices.clear();
 
 	tempMesh.vertexCount = (unsigned int)tempVertices.size(); //Set the new vertex count
 	exporter->meshVertices.push_back(new Luna::Vertex[tempMesh.vertexCount]); //Creates a new array of vertices for the mesh
@@ -187,15 +312,6 @@ void Reader::GetMeshData(FbxMesh* mesh, Exporter* exporter) {
 
 	for (unsigned int i = 0; i < tempMesh.indexCount; i++) { //Transfer the index information
 		exporter->meshIndices[tempMesh.id][i] = tempIndices[i];
-	}
-	
-	tempMesh.hasSkeleton = hasSkeleton(mesh->GetNode());
-	if (tempMesh.hasSkeleton) {
-		//std::cout << "The mesh has a skeleton!" << std::endl; //Debug
-
-		exporter->weights.push_back(new Luna::Weights[tempMesh.vertexCount]); //Create a container for all of the mesh weights
-		GetWeightsData(mesh, tempMesh.id, exporter); //Since we know that the mesh is skinned we can get the weights
-		GetAnimationData(mesh, tempMesh.id, exporter);
 	}
 
 	GetMaterialData(mesh, exporter); //Since it's a mesh it should have a material which we will get
@@ -500,6 +616,7 @@ void Reader::GetWeightsData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exp
 			}
 		}
 	}
+	/*std::cout << "Death" << std::endl;*/
 }
 
 void Reader::GetAnimationData(FbxMesh* fbxmesh, unsigned int meshID, Exporter* exporter) {
